@@ -11,9 +11,14 @@ function createAccount(username, password) {
 }
 
 function login(username, password) {
-  if (username == "admin.admin" && password == "password") {
-    
-  }
+    const account = accounts.find(acc => acc.username === username && acc.password === password);
+    if (account) {
+        console.log("Login successful! Welcome, " + account.username);
+    } else if (username === "admin.admin" && password === "password") {
+        console.log("Login successful as admin.");
+    } else {
+        console.log("Invalid username or password.");
+    }
 }
 
 function signup(username, password) {
