@@ -1,25 +1,10 @@
-/*
-    This is your CSS file! This is how we make our website
-    look very pretty. We also tend to write code in here that
-    makes sure our website looks good on phones.
-*/
-
-/*
-    Don't worry too much about what this code here does - it just
-    makes our coding life slightly less frustrating.
-    However, you're more than welcome to ask me if want to know all
-    the technical details! 😉
-*/
-* {
+ {
     margin: 0;
     box-sizing: border-box;
   }
   
   @media screen and (max-width: 600px) {
-    /*
-          Specific styles that change how our website looks on phones
-          and smaller screens should go here.
-      */
+    
   }
   
   header {
@@ -146,3 +131,19 @@
     border: none;
     color: white;
   }
+
+  .profilepic {
+    height: 25px;
+    width: 25px;
+    float: left;
+    padding-right: 1px;
+  }
+
+.testAccount {
+  width: 150px;
+  height: 25px;
+}
+
+.testAccount:hover {
+  background-color: blueviolet;
+}
