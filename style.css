@@ -1,0 +1,148 @@
+/*
+    This is your CSS file! This is how we make our website
+    look very pretty. We also tend to write code in here that
+    makes sure our website looks good on phones.
+*/
+
+/*
+    Don't worry too much about what this code here does - it just
+    makes our coding life slightly less frustrating.
+    However, you're more than welcome to ask me if want to know all
+    the technical details! 😉
+*/
+* {
+    margin: 0;
+    box-sizing: border-box;
+  }
+  
+  @media screen and (max-width: 600px) {
+    /*
+          Specific styles that change how our website looks on phones
+          and smaller screens should go here.
+      */
+  }
+  
+  header {
+    display: flex;
+  }
+  
+  body {
+    background-color: cadetblue;
+  }
+  
+  .heading {
+    text-align: left;
+    background-color: blueviolet;
+    padding-left: 40px;
+    width: 100%;
+    padding-right: 40px;
+    font-family: monospace;
+  }
+  
+  .loginButton {
+    text-align: right;
+    background-color: palevioletred;
+  }
+  
+  .navigation {
+    background-color: blueviolet;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+  
+  .navigation li {
+    float: left;
+  }
+  
+  .navigation li a {
+    padding: 14px 16px;
+    font-size: 50;
+    text-decoration: none;
+    color: black;
+    display: block;
+    text-align: center;
+  }
+  
+  .createServerButton {
+    text-decoration: none;
+    font-size: 40px;
+    padding-left: 20px;
+    color: black;
+  }
+  
+  .createServerForm {
+    font-family: monospace;
+    background-color: blueviolet;
+  }
+  
+  .serverList {
+    padding-left: 20px;
+    padding-top: 20px;
+  }
+  
+  .serverList a {
+    text-decoration: none;
+    color: black;
+    font-size: 30px;
+  }
+  
+  .serverHeader {
+    background-color: blueviolet;
+    font-family: monospace;
+    padding-left: 60px;
+  }
+  
+  .menuButton {
+    width: 32px;
+  }
+  
+  .memberList {
+    text-align: center;
+    font-family: monospace;
+    background-color: rgb(63, 109, 110);
+    height: 500px;
+    width: 150px;
+  }
+  
+  .mainDisplay {
+    display: flex;
+    height: 100%;
+  }
+  
+  .mainArea {
+    width: calc(100% - 300px);
+    padding-left: 20px;
+    padding-right: 20px;
+    height: 100%;
+  }
+  
+  .channelList {
+    height: 500px;
+    width: 150px;
+    background-color: rgb(63, 109, 110);
+  }
+  
+  .channelList a {
+    text-decoration: none;
+    color: black;
+  }
+  
+  .channelHeader,
+  .messageBox {
+    height: 10%;
+  }
+  
+  .channelMessages {
+    height: 62%;
+    max-height: 62%;
+    overflow-y: auto;
+  }
+  
+  .messageBox input {
+    background: rgb(41, 5, 38);
+    width: 100%;
+    border: none;
+    color: white;
+  }
