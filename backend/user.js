@@ -4,7 +4,7 @@ const username = document.getElementById('usrname');
 const password = document.getElementById('pswrd');
 let accounts = [];
 
-function createEnvryptionKey(userid) {
+function createEncryptionKey(userid) {
   // Create non duplicate number
   let usedIds = [];
   for (let x in accounts) do {
@@ -19,6 +19,7 @@ function getEncrytionKey(userid) {
 
 function encryptPassword(password, key) {
   if (password && key) {
+    let key = createEncryptionKey();
     let newPassword = password;
     return newPassword;
   } else {
