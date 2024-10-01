@@ -4,12 +4,30 @@ const username = document.getElementById('usrname');
 const password = document.getElementById('pswrd');
 let accounts = [];
 
+function encryptPassword(password, key) {
+  if (password && key) {
+    let newPassword = password;
+    return newPassword;
+  } else {
+    return null;
+  }
+}
+
+function decryptPassword(password, key) {
+  if (password && key) {
+    let decryptedPassword = password;
+    return decryptedPassword;
+  }
+}
+
 function createAccount(username, password) {
   const newAccount = {
     userid: accounts.length + 1,
     username: username,
     password: password,
   };
+  let encryptedPassword = encryptPassword(newAccount.password, );
+  newAccount.password = encryptedPassword;
   accounts.push(newAccount);
   return newAccount;
 }
