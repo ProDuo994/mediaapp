@@ -4,6 +4,19 @@ const username = document.getElementById('usrname');
 const password = document.getElementById('pswrd');
 let accounts = [];
 
+function createEnvryptionKey(userid) {
+  // Create non duplicate number
+  let usedIds = [];
+  for (let x in accounts) do {
+    let id = accounts.at(x);
+    userIds.push(id);
+  }
+}
+
+function getEncrytionKey(userid) {
+  // TODO
+}
+
 function encryptPassword(password, key) {
   if (password && key) {
     let newPassword = password;
@@ -20,19 +33,21 @@ function decryptPassword(password, key) {
   }
 }
 
-function createAccount(username, password) {
+function createAccount(username, password, key) {
   const newAccount = {
     userid: accounts.length + 1,
     username: username,
     password: password,
+    key: key
   };
-  let encryptedPassword = encryptPassword(newAccount.password, );
+  let encryptedPassword = encryptPassword(newAccount.password, createEncryptionKey(newAccount.userid));
   newAccount.password = encryptedPassword;
   accounts.push(newAccount);
   return newAccount;
 }
 
 function login(username, password) {
+  let key = getEncryptionKey();
   const account = accounts.find(acc => acc.username === username && acc.password === password);
   if (account) {
       console.log("Login successful! Welcome, " + account.username);
@@ -52,9 +67,9 @@ function signup(username, password) {
     console.log("Username allready exists");
     return;
   }
-  const newAccount = createAccount(username, password);
+  const newAccount = createAccount(username, password, 1);
   console.log("New account created");
 }
 signupButton.addEventListener('click', (event) => {
-  
+  signup("testusername", "testpass");
 });
