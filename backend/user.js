@@ -52,8 +52,10 @@ function login(username, password) {
   const account = accounts.find(acc => acc.username === username && acc.password === password);
   if (account) {
       console.log("Login successful! Welcome, " + account.username);
+      location.assign('https://produo994.github.io/mediaapp/frontend/chat.html');
   } else if (username === "admin.admin" && password === "password") {
       console.log("Login successful as admin.");
+      location.assign('https://produo994.github.io/mediaapp/frontend/chat.html');
   } else {
       console.log("Invalid username or password.");
   }
@@ -70,6 +72,7 @@ function signup(username, password) {
   }
   const newAccount = createAccount(username, password, 1);
   console.log("New account created");
+  location.assign('https://produo994.github.io/mediaapp/frontend/chat.html');
 }
 signupButton.addEventListener('click', (event) => {
   signup("testusername", "testpass");
