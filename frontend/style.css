@@ -142,6 +142,7 @@
 .testAccount {
   width: 150px;
   height: 25px;
+  padding-bottom: 5px;
 }
 
 .testAccount:hover {
