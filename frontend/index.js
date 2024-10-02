@@ -59,9 +59,4 @@ function createChat(name, des) {
   });
 }
 
-function openServerMenu() {
-  document.getElementById("severMenu").style.visibility = "visible";
-}
-document.getElementById("menuIcon").addEventListener("click", () => {
-  openServerMenu();
-});
+
