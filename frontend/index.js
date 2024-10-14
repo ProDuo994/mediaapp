@@ -1,4 +1,4 @@
-let server = "http://192.168.2.68:3000";
+const server = "http://192.168.2.71:3000";
 
 function login(username, password) {
   fetch(`${server}/login`, {
@@ -59,4 +59,15 @@ function createChat(name, des) {
   });
 }
 
-
+function getChatID() {
+  fetch(`${server}/getChatID`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Content-Type-Options": "nosniff",
+    },
+    body: JSON.stringify({}),
+  }).then((res) => {
+    res.json().then((json) => json);
+  });
+}

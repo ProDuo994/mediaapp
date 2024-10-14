@@ -22,15 +22,18 @@ app.get("/createChat", (req, res) => {
   res.send("Hello World!");
   createChat();
 });
+app.get("/getChatID", (req, res) => {
+  let chatID = "abc";
+  res.send(chatID);
+});
 
 function createChat(chatName, chatDes, chatOwner) {
   let exists = activeChats.find(chatName);
   if (exists) {
-    console.log("Name allready ezists");
+    console.log("Name allready exists");
   } else {
     // Add chat to database
     const { database } = JSON.parse(fs.readFileSync("./database.json"));
-    
   }
 }
 
