@@ -57,19 +57,6 @@ function decryptPassword(password) {
   });
 }
 
-function createAccount(username, password, key) {
-  const newAccount = {
-    userid: accounts.length + 1,
-    username: username,
-    password: password,
-    key: key,
-  };
-  let encryptedPassword = encryptPassword(newAccount.password);
-  newAccount.password = encryptedPassword;
-  accounts.push(newAccount);
-  return newAccount;
-}
-
 function login(username, password) {
   let key = getEncryptionKey();
   const account = accounts.find(

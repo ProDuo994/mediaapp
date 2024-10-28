@@ -14,17 +14,20 @@ app.post("/login", (req, res) => {
   });
 });
 
-app.get("/sendmsg", (req, res) => {
-  sendMessage();
+app.post("/sendmsg", (req, res) => {
+  let message = sendMessage("sender", "message", "timesent");
+  res.status(200).send(message);
 });
 
-app.get("/createChat", (req, res) => {
+app.post("/createChat", (req, res) => {
   res.send("Hello World!");
   createChat();
 });
 app.get("/getChatID", (req, res) => {
-  let chatID = "abc";
-  res.send(chatID);
+  const chatID = {
+    id: "abc",
+  };
+  res.send(JSON.stringify(chatID));
 });
 
 function createChat(chatName, chatDes, chatOwner) {
@@ -53,12 +56,11 @@ function openChannel(num) {
 }
 
 function sendMessage(sender, message, timesent) {
-  let sendersAccount;
-  let messageTime;
-  let read = false;
-  //Find sender's account
+  let sendersAccount = sender;
+  let messageTime = timesent;
   //Send the message under the sender's account
-  //Show the time the message was sent
+  let fullmessage = sendersAccount + ": " + message;
+  return fullmessage;
   // Tells the server when the message is read
   // Sends HTTP protocal to confirm message sent
 }
