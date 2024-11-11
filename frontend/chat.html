@@ -20,11 +20,7 @@
         />
       </button>
       <h1>Server Name</h1>
-      <div
-        class="serverMenu"
-        id="serverMenu"
-        style="visibility: hidden; background-color: lightpink"
-      >
+      <div class="serverMenu" id="serverMenu">
         <h2>Settings</h2>
         <h3>Group</h3>
         <h3>Members</h3>
@@ -53,11 +49,14 @@
       <div class="memberList">
         <h2>Server Members</h2>
         <br />
-        <div class="testAccount" id="testAccount">
+        <div class="account" id="account">
           <img src="images/account(1).jpeg" alt="p" class="profilepic" />
           <h4>Your Name</h4>
+          <div class="accountPage">
+            <h1>Your Name</h1>
+          </div>
         </div>
-        <div class="testAccount" id="testAccount">
+        <div class="account" id="account">
           <img src="images/account(1).jpeg" alt="p" class="profilepic" />
           <h4>Their Name</h4>
         </div>
@@ -69,16 +68,6 @@
       const messageViewBox = document.getElementById("channelMessages");
       const channel1Button = document.getElementById("channel1");
       const channel2Button = document.getElementById("channel2");
-
-      messageBoxInput.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") {
-          const message = messageBoxInput.value;
-          messageBoxInput.value = "";
-          createAndAppend("p", messageViewBox, message);
-          messageHistory.push(message);
-          sendMessage("username", message, "time");
-        }
-      });
 
       const createAndAppend = (element, parent, content) => {
         const newElement = document.createElement(element);
@@ -92,5 +81,6 @@
         openChannel(2);
       });
     </script>
+    <script src="chat.js"></script>
   </body>
 </html>

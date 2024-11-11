@@ -39,6 +39,7 @@ body {
   margin: 0;
   padding: 0;
   overflow: hidden;
+  position: fixed;
 }
 
 .navigation li {
@@ -94,6 +95,7 @@ body {
   background-color: rgb(63, 109, 110);
   height: 500px;
   width: 150px;
+  border: solid transparent;
 }
 
 .mainDisplay {
@@ -127,6 +129,7 @@ body {
 .channelMessages {
   height: 80%;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .messageBox input {
@@ -143,13 +146,13 @@ body {
   padding-right: 1px;
 }
 
-.testAccount {
+.account {
   width: 150px;
   height: 25px;
   padding-bottom: 3px;
 }
 
-.testAccount:hover {
+.account:hover {
   background-color: blueviolet;
 }
 
@@ -157,4 +160,41 @@ body {
   cursor: pointer;
 }
 
+.account:hover {
+  cursor: pointer;
+}
 
+.serverMenu {
+  visibility: hidden;
+  background-color: lightpink;
+}
+
+.accountPage {
+  display: none;
+  position: absolute;
+  background-color: blueviolet;
+  min-width: 200px;
+  left: 0;
+  z-index: 1;
+}
+
+.account:hover .accountPage {
+  display: block;
+}
+
+.loginBtn {
+  background-color: lightpink;
+}
+
+.loginTitle {
+  padding-bottom: 15px;
+  padding-left: 10px;
+}
+
+.usrname {
+  background-color: blueviolet;
+}
+
+.pswrd {
+  background-color: blueviolet;
+}

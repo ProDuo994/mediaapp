@@ -3,7 +3,12 @@ import cors from "cors";
 import fs from "fs";
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: "*",
+    credentials: true,
+  })
+);
 
 const port = 3000;
 let activeChats = [];
@@ -14,17 +19,43 @@ app.post("/login", (req, res) => {
   });
 });
 
-app.get("/sendmsg", (req, res) => {
-  sendMessage();
+app.post("/sendmsg", (req, res) => {
+  let message = sendMessage("sender", "message", "timesent");
+  console.log(message);
+  res.status(200).json(message);
 });
 
-app.get("/createChat", (req, res) => {
+app.post("/createChat", (req, res) => {
   res.send("Hello World!");
   createChat();
 });
 app.get("/getChatID", (req, res) => {
-  let chatID = "abc";
+  const chatID = {
+    id: "abc",
+  };
   res.send(chatID);
+});
+
+app.get("/getChatMessages", (req, res) => {
+  let serverID = req.query.serverID;
+  if (serverID == undefined) {
+    res.status(400);
+  }
+  const chatMessages = [
+    {
+      username: "Ben",
+      message: "hello world",
+    },
+    {
+      username: "Other Ben",
+      message: "a",
+    },
+    {
+      username: "Copy of Ben",
+      message: "b",
+    },
+  ];
+  res.send(chatMessages);
 });
 
 function createChat(chatName, chatDes, chatOwner) {
@@ -37,9 +68,9 @@ function createChat(chatName, chatDes, chatOwner) {
   }
 }
 
-function deleteChat() {}
+function deleteChat(chatID) {}
 
-function getChatMembers(chatName) {
+function getChatMembers(chatID) {
   let chatMembers;
   return chatMembers;
 }
@@ -53,16 +84,17 @@ function openChannel(num) {
 }
 
 function sendMessage(sender, message, timesent) {
-  let sendersAccount;
-  let messageTime;
-  let read = false;
-  //Find sender's account
+  let sendersAccount = sender;
+  let messageTime = timesent;
   //Send the message under the sender's account
-  //Show the time the message was sent
+  let fullmessage = sendersAccount + ": " + message;
+  return { message: fullmessage };
   // Tells the server when the message is read
   // Sends HTTP protocal to confirm message sent
 }
 
 app.listen(port, () => {
-  console.log(`Mediapp listening on port ${port}`);
+  console.log(
+    `Mediapp listening on port ${port}. If you are even bothered to read this message you will be heavily dissapointed in the quality of this writing`
+  );
 });
