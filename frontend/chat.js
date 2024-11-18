@@ -2,6 +2,9 @@ const server = "http://192.168.2.71:3000";
 const accountName = "Admin";
 const D = new Date();
 let time = D.getTime();
+let lastAmountOfMessages = -1;
+const currentChatMessages = document.getElementById("channelMessages");
+const chatMessagesFromServer = "";
 
 function sendMessage(sender, message) {
   fetch(`${server}/sendmsg`, {
@@ -75,18 +78,32 @@ function getMessageFromServer(serverID) {
   return getMessagePromise;
 }
 
+function getChannelMessageServer(name) {
+  fetch(`${server}/getChannelMessageServer`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Content-Type-Options": "nosniff",
+    },
+  }).then((res) => {
+    res.json().then((json) => (chatMessagesFromServer = res));
+  });
+}
+
 function pollMessages() {
-  // tracking current messages
-  // then getMessages
-  // current messages to retrieved messages
   const savedMessages = getMessageFromServer(0)
     .then((res) => {
-      for (const message of res) {
-        createAndAppend(
-          "p",
-          messageViewBox,
-          message.username + ": " + message.message
-        );
+      const server1 = res["SERVER 1"];
+      const channel1Messages = server1["Channel 1"].messages;
+      if (channel1Messages.length > lastAmountOfMessages) {
+        for (const message of channel1Messages) {
+          createAndAppend(
+            "p",
+            messageViewBox,
+            message.username + ": " + message.message
+          );
+        }
+        lastAmountOfMessages = channel1Messages.length;
       }
     })
     .catch((err) => {

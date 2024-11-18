@@ -1,11 +1,18 @@
-FIX COAS ISSUE
-Finish SendMsg()
+Send/Receve Messages
+Messages send from server but are pre-defined and can't be updated
+Needs to update to messages saved in server
+Needs to save the messsages to server
+
 Server Menu
+needs to open when you push the menuButton
+can be hidden by clicking out
+
 Server Accounts Menu
 Server Customisation
 Better CSS
 HTML clean
+Code needs to be easy to run and optimised to slow machines
+
 Make Multi-Account Login
 
 TODAY:
-Account manager
