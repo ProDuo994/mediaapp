@@ -65,9 +65,16 @@ function createAccount(username, password) {
   // create account and save it to the JSON file
   const userId = getNewUserId();
   const newUser = new User(username, password, userId);
-  writeDatabase(newUser, "database/users.json");
+  const newUserJSON = newUser.getAsJSON();
+  writeDatabase(newUserJSON, "database/users.json");
 }
 
-function deleteAccount(username) {}
+function deleteAccount(username) {
+  let database = "database/users.json"
+}
 
-function changePassword(username, currentPassword, newPassword) {}
+function changePassword(username, currentPassword, newPassword) {
+  let database = "database/users.json"
+  if (username == database.username) {
+    
+}
