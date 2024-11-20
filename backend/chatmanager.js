@@ -12,6 +12,7 @@ app.use(
 
 const port = 3000;
 let activeChats = [];
+let serverOnline = false;
 
 app.post("/login", (req, res) => {
   res.status(200).json({
@@ -102,7 +103,9 @@ function createChat(chatName, chatDes, chatOwner) {
   }
 }
 
-function deleteChat(chatID) {}
+function deleteChat(chatID) {
+  let servers = "database/servers.json";
+}
 
 function getChatMembers(chatID) {
   let chatMembers;
@@ -129,6 +132,9 @@ function sendMessage(sender, message, timesent) {
 
 app.listen(port, () => {
   console.log(
-    `Mediapp listening on port ${port}. If you are even bothered to read this message you will be heavily dissapointed in the quality of this writing`
+    `Mediapp listening on port ${port}.`
   );
+  serverOnline = true
 });
+
+app.enable('mediapp server'); // enables the server for simpiler defining and naming
