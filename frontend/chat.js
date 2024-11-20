@@ -33,6 +33,7 @@ function createChat(name, des) {
 }
 
 function getChatID(name) {
+  let chatID = 0;
   fetch(`${server}/getChatID`, {
     method: "GET",
     headers: {
@@ -40,7 +41,7 @@ function getChatID(name) {
       "X-Content-Type-Options": "nosniff",
     },
   }).then((res) => {
-    res.json().then((json) => console.log(json));
+    res.json().then((json) => chatID = res);
   });
 }
 
@@ -124,6 +125,7 @@ messageBoxInput.addEventListener("keydown", (event) => {
 
 function loadServerData(serverID) {
   let database = "../backend/database.json";
+  let listOfDatabases = database.servers;
 }
 
 function saveServerData(serverID) {
