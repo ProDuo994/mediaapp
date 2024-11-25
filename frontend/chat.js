@@ -41,7 +41,7 @@ function getChatID(name) {
       "X-Content-Type-Options": "nosniff",
     },
   }).then((res) => {
-    res.json().then((json) => chatID = res);
+    res.json().then((json) => (chatID = res));
   });
 }
 

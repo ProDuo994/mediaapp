@@ -32,6 +32,27 @@ function login(username, password) {
     .catch((err) => console.error(err));
 }
 
+function createAccount(username, password) {
+  fetch(`${server}/createAccount`, {
+    method: "POST", // HTTP protocal being used
+    headers: {
+      "Content-Type": "application/json",
+      "X-Content-Type-Options": "nosniff",
+    },
+    body: JSON.stringify({
+      username,
+      password,
+    }),
+  })
+    .then((res) =>
+      res.json().then((json_res) => {
+        // add username to database to make sure that
+        processLogin(json_res, username, password);
+      })
+    ) // waits for response then prints to log
+    .catch((err) => console.error(err));
+}
+
 function enryptPassword(password) {
   if (password != null) {
   } else {
@@ -43,5 +64,11 @@ function decryptPassword(password) {
   if (password != null) {
   } else {
     console.warn("Password not provided");
+  }
+}
+
+function signup(username, password) {
+  if (username != null && password != null) {
+    createAccount(username, password);
   }
 }

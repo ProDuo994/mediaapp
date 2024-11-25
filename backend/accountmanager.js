@@ -1,10 +1,11 @@
+import fs from "fs";
+
 class User {
   constructor(username, password, userid) {
     this.username = username;
     this.password = password;
     this.userid = userid;
   }
-
   getAsJSON() {
     //Returns the account as a JSON
     return {
@@ -12,6 +13,14 @@ class User {
       password: this.password,
       userid: this.userid,
     };
+  }
+  deleteAccount() {
+    delete this;
+  }
+  changePassword(currentPassword, newPassword) {
+    if (currentPassword == this.password) {
+      this.password = newPassword;
+    }
   }
 }
 
@@ -61,20 +70,10 @@ function getNewUserId() {
   return 1;
 }
 
-function createAccount(username, password) {
+export function createAccount(username, password) {
   // create account and save it to the JSON file
   const userId = getNewUserId();
   const newUser = new User(username, password, userId);
   const newUserJSON = newUser.getAsJSON();
   writeDatabase(newUserJSON, "database/users.json");
-}
-
-function deleteAccount(username) {
-  let database = "database/users.json"
-}
-
-function changePassword(username, currentPassword, newPassword) {
-  let database = "database/users.json"
-  if (username == database.username) {
-    
 }

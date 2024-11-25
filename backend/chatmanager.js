@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import fs from "fs";
+import { createAccount } from "./accountmanager.js";
 const app = express();
 app.use(express.json());
 app.use(
@@ -40,6 +41,16 @@ app.get("/getChatID", (req, res) => {
 app.get("/getChannelMessageServer", (req, res) => {
   const chatMessages = readDatabase("database/servers.json");
   res.send(chatMessages);
+});
+
+app.post("/createAccount", (req, res) => {
+  const username = req.query.username;
+  const password = req.query.password;
+  createAccount(username, password);
+  res.status(200).json({
+    username,
+    password,
+  });
 });
 
 function readDatabase(name) {
@@ -131,10 +142,8 @@ function sendMessage(sender, message, timesent) {
 }
 
 app.listen(port, () => {
-  console.log(
-    `Mediapp listening on port ${port}.`
-  );
-  serverOnline = true
+  console.log(`Mediapp listening on port ${port}.`);
+  serverOnline = true;
 });
 
-app.enable('mediapp server'); // enables the server for simpiler defining and naming
+app.enable("mediapp server"); // enables the server for simpiler defining and naming
