@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
 import fs from "fs";
-import { createAccount } from "./accountmanager.js";
 const app = express();
 app.use(express.json());
 app.use(
@@ -13,7 +12,6 @@ app.use(
 
 const port = 3000;
 let activeChats = [];
-let serverOnline = false;
 
 app.post("/login", (req, res) => {
   res.status(200).json({
@@ -33,7 +31,7 @@ app.post("/createChat", (req, res) => {
 });
 app.get("/getChatID", (req, res) => {
   const chatID = {
-    id: "abc",
+    id: "1",
   };
   res.send(chatID);
 });
@@ -41,16 +39,6 @@ app.get("/getChatID", (req, res) => {
 app.get("/getChannelMessageServer", (req, res) => {
   const chatMessages = readDatabase("database/servers.json");
   res.send(chatMessages);
-});
-
-app.post("/createAccount", (req, res) => {
-  const username = req.query.username;
-  const password = req.query.password;
-  createAccount(username, password);
-  res.status(200).json({
-    username,
-    password,
-  });
 });
 
 function readDatabase(name) {
@@ -134,7 +122,6 @@ function openChannel(num) {
 function sendMessage(sender, message, timesent) {
   let sendersAccount = sender;
   let messageTime = timesent;
-  //Send the message under the sender's account
   let fullmessage = sendersAccount + ": " + message;
   return { message: fullmessage };
   // Tells the server when the message is read
@@ -142,8 +129,8 @@ function sendMessage(sender, message, timesent) {
 }
 
 app.listen(port, () => {
-  console.log(`Mediapp listening on port ${port}.`);
-  serverOnline = true;
+  console.log(
+    `Mediapp listening on port ${port}.`
+  );
 });
-
-app.enable("mediapp server"); // enables the server for simpiler defining and naming
+app.enable('mediapp server'); // enables the server for simpiler defining and naming

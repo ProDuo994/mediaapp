@@ -1,4 +1,4 @@
-import fs from "fs";
+let Users = [];
 
 class User {
   constructor(username, password, userid) {
@@ -6,6 +6,7 @@ class User {
     this.password = password;
     this.userid = userid;
   }
+
   getAsJSON() {
     //Returns the account as a JSON
     return {
@@ -14,12 +15,16 @@ class User {
       userid: this.userid,
     };
   }
-  deleteAccount() {
+  delete() {
     delete this;
   }
-  changePassword(currentPassword, newPassword) {
-    if (currentPassword == this.password) {
-      this.password = newPassword;
+}
+
+function findUserfromName(username) {
+  for (let i = 0; i < Users.length; i++) {
+    if (Users[i] == username) {
+      let user = Users[i]
+      return user
     }
   }
 }
@@ -70,10 +75,23 @@ function getNewUserId() {
   return 1;
 }
 
-export function createAccount(username, password) {
+function createAccount(username, password) {
   // create account and save it to the JSON file
   const userId = getNewUserId();
   const newUser = new User(username, password, userId);
-  const newUserJSON = newUser.getAsJSON();
-  writeDatabase(newUserJSON, "database/users.json");
+  writeDatabase(newUser, "database/users.json");
+}
+
+function deleteAccount(username) {
+  let account = findUserfromName(username);
+  account.delete();
+}
+
+function changePassword(username, currentPassword, newPassword) {
+  let account = findUserfromName(username);
+  if (account.password != newPassword && newPassword != currentPassword) {
+      account.password = newPassword;
+  } else {
+    console.error("Failed to change password")
+  }
 }

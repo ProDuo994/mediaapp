@@ -121,6 +121,11 @@ body {
   color: black;
 }
 
+.channelList a:hover {
+  text-decoration: none;
+  color: skyblue;
+}
+
 .channelHeader,
 .messageBox {
   height: 10%;
@@ -173,7 +178,7 @@ body {
   display: none;
   position: absolute;
   background-color: blueviolet;
-  min-width: 200px;
+  min-width: 100px;
   left: 0;
   z-index: 1;
 }
