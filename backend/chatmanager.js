@@ -13,18 +13,29 @@ app.use(
 const port = 3000;
 let activeChats = [];
 
+function checkTokenValid(token) {
+  if (token) {
+    return true;
+  }
+  return false;
+}
+
 app.post("/login", (req, res) => {
   res.status(200).json({
     message: "login on chatmanager",
   });
+  let token = req.query.token
+  if (checkTokenValid(token)) {
+    res.status(200);
+  } else {
+    res.status(401);
+  }
 });
-
 app.post("/sendmsg", (req, res) => {
   let message = sendMessage("sender", "message", "timesent");
   console.log(message);
   res.status(200).json(message);
 });
-
 app.post("/createChat", (req, res) => {
   res.send("Hello World!");
   createChat();
@@ -35,7 +46,6 @@ app.get("/getChatID", (req, res) => {
   };
   res.send(chatID);
 });
-
 app.get("/getChannelMessageServer", (req, res) => {
   const chatMessages = readDatabase("database/servers.json");
   res.send(chatMessages);
@@ -87,6 +97,7 @@ app.get("/getChatMessages", (req, res) => {
   let serverID = req.query.serverID;
   if (serverID == undefined) {
     res.status(400);
+    return;
   }
   const chatMessages = readDatabase("database/servers.json");
   res.send(chatMessages);
@@ -127,7 +138,6 @@ function sendMessage(sender, message, timesent) {
   // Tells the server when the message is read
   // Sends HTTP protocal to confirm message sent
 }
-
 app.listen(port, () => {
   console.log(
     `Mediapp listening on port ${port}.`

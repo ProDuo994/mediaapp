@@ -55,7 +55,7 @@
           <div class="accountPage">
             <h1>Your Name</h1>
             <p>Profile Description</p>
-            <button type="button">ADD FREIND</button>
+            <button type="button" class="freindbutton" onclick="addFreind(1)"><b>ADD FREIND</b></button>
           </div>
         </div>
         <div class="account" id="account">
@@ -64,13 +64,12 @@
           <div class="accountPage">
             <h1>Their Name</h1>
             <p>Profile Description</p>
-            <button type="button">ADD FREIND</button>
+            <button type="button" class="freindbutton" onclick="addFreind(2)"><b>ADD FREIND</b></button>
           </div>
         </div>
       </div>
     </div>
     <script>
-      var messageHistory = [];
       const messageBoxInput = document.getElementById("messageBoxInput");
       const messageViewBox = document.getElementById("channelMessages");
       const channel1Button = document.getElementById("channel1");

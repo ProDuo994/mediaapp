@@ -23,21 +23,12 @@
     >
       Login
     </button>
-    <button
-      id="signupBtn"
-      onclick="signup(document.getElementById('usrname').value, document.getElementById('pswrd').value)"
-    >
-      Sign Up
-    </button>
+    <button id="signupBtn">Sign Up</button>
   </body>
   <script>
-    const passwordFeild = document.getElementById("pswrd");
-    passwordFeild.addEventListener("keydown", (event) => {
+    messageBoxInput.addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
-        login(
-          document.getElementById("usrname").value,
-          document.getElementById("pswrd").value
-        );
+        // Login
       }
     });
   </script>

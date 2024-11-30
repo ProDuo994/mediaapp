@@ -93,9 +93,14 @@ body {
   text-align: center;
   font-family: monospace;
   background-color: rgb(63, 109, 110);
-  height: 500px;
+  height: 700px;
   width: 150px;
   border: solid transparent;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  padding-top: .5rem;
+  padding-bottom: .5rem;
+  overflow-y: auto;
 }
 
 .mainDisplay {
@@ -180,7 +185,7 @@ body {
   background-color: blueviolet;
   min-width: 100px;
   left: 0;
-  z-index: 1;
+  margin-left: 1615px;
 }
 
 .account:hover .accountPage {
@@ -202,4 +207,9 @@ body {
 
 .pswrd {
   background-color: blueviolet;
+}
+
+.freindbutton {
+  background-color: lightblue;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }

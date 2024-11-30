@@ -1,13 +1,23 @@
-const server = "http://192.168.2.71:3000";
+const server = "http://10.221.192.210:3000";
 const accountName = "Admin";
 const D = new Date();
 let time = D.getTime();
 let lastAmountOfMessages = -1;
 const currentChatMessages = document.getElementById("channelMessages");
 const chatMessagesFromServer = "";
+let ServerName = "server";
 
 function sendMessage(sender, message) {
-  fetch(`${server}/sendmsg`, {
+  const getMessagePromise = new Promise((resolve, reject) => {
+    if (sender == undefined || message == undefined) {
+      reject("Must provide all arguments");
+      return;
+    }
+  })
+  fetch(`${server}/sendmsg?${new URLSearchParams({
+    sender: sender,
+    messgae: message
+  }).toString()} `, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -16,6 +26,7 @@ function sendMessage(sender, message) {
   }).then((res) => {
     console.log(res);
   });
+  return getMessagePromise;
 }
 
 function createChat(name, des) {
@@ -33,7 +44,6 @@ function createChat(name, des) {
 }
 
 function getChatID(name) {
-  let chatID = 0;
   fetch(`${server}/getChatID`, {
     method: "GET",
     headers: {
@@ -41,7 +51,10 @@ function getChatID(name) {
       "X-Content-Type-Options": "nosniff",
     },
   }).then((res) => {
-    res.json().then((json) => (chatID = res));
+    res.json().then((json) => {
+      let chatID = json;
+      return chatID;
+    });
   });
 }
 
@@ -91,6 +104,13 @@ function getChannelMessageServer(name) {
   });
 }
 
+function getMessagesFromClient() {
+  let messages = {
+    "Admin": "Hello"
+  }
+  return messages;
+}
+
 function pollMessages() {
   const savedMessages = getMessageFromServer(0)
     .then((res) => {
@@ -111,6 +131,7 @@ function pollMessages() {
       console.error(err);
     });
   // Save messages in current chat to server
+  saveServerData(getChatID(ServerName));
 }
 
 messageBoxInput.addEventListener("keydown", (event) => {
@@ -125,13 +146,16 @@ messageBoxInput.addEventListener("keydown", (event) => {
 
 function loadServerData(serverID) {
   let database = "../backend/database.json";
-  let listOfDatabases = database.servers;
 }
 
 function saveServerData(serverID) {
   let database = "../backend/database.json";
+  let currentMessages = getMessagesFromClient();
 }
 
-let name = "server";
-loadServerData(getChatID(name));
+function addFreind(UserID) {
+  console.log("Freind Added With ID: " + UserID)
+}
+
+loadServerData(getChatID(ServerName));
 const msgReceiveInteval = setInterval(pollMessages, 3000);
