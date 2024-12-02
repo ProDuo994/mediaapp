@@ -1,4 +1,4 @@
-const server = "http://10.221.192.210:3000";
+const server = "http://192.168.2.71:3000";
 
 function processLogin(loginInfo, username, password) {
   console.log(loginInfo);

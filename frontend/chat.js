@@ -1,32 +1,47 @@
-const server = "http://10.221.192.210:3000";
+const server = "http://192.168.2.71:3000";
 const accountName = "Admin";
 const D = new Date();
 let time = D.getTime();
 let lastAmountOfMessages = -1;
-const currentChatMessages = document.getElementById("channelMessages");
+const currentChatMessages = document.getElementById("channelMessages").children;
 const chatMessagesFromServer = "";
 let ServerName = "server";
+let messageHistory = [];
 
 function sendMessage(sender, message) {
-  const getMessagePromise = new Promise((resolve, reject) => {
-    if (sender == undefined || message == undefined) {
+  return new Promise((resolve, reject) => {
+    if (sender === undefined || message === undefined) {
       reject("Must provide all arguments");
       return;
     }
-  })
-  fetch(`${server}/sendmsg?${new URLSearchParams({
-    sender: sender,
-    messgae: message
-  }).toString()} `, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ sender, message }),
-  }).then((res) => {
-    console.log(res);
+
+    fetch(
+      `${server}/sendmsg?${new URLSearchParams({
+        sender: sender,
+        message: message,
+      }).toString()}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ sender, message }),
+      }
+    )
+      .then((res) => {
+        if (res.status === 200) {
+          resolve(res);
+          console.log(res);
+        } else {
+          reject("Failed to send message");
+          console.warn("Failed to send message");
+        }
+      })
+      .catch((err) => {
+        reject(err);
+        console.error("Error:", err);
+      });
   });
-  return getMessagePromise;
 }
 
 function createChat(name, des) {
@@ -67,7 +82,7 @@ function getMessageFromServer(serverID) {
 
     fetch(
       `${server}/getChatMessages?${new URLSearchParams({
-        serverID: 0,
+        serverID: serverID,
       }).toString()}`,
       {
         method: "GET",
@@ -106,13 +121,13 @@ function getChannelMessageServer(name) {
 
 function getMessagesFromClient() {
   let messages = {
-    "Admin": "Hello"
-  }
+    Admin: "Hello",
+  };
   return messages;
 }
 
-function pollMessages() {
-  const savedMessages = getMessageFromServer(0)
+function pollMessages(serverID) {
+  const savedMessages = getMessageFromServer(serverID)
     .then((res) => {
       const server1 = res["SERVER 1"];
       const channel1Messages = server1["Channel 1"].messages;
@@ -154,8 +169,8 @@ function saveServerData(serverID) {
 }
 
 function addFreind(UserID) {
-  console.log("Freind Added With ID: " + UserID)
+  console.log("Freind Added With ID: " + UserID);
 }
 
 loadServerData(getChatID(ServerName));
-const msgReceiveInteval = setInterval(pollMessages, 3000);
+const msgReceiveInteval = setInterval(pollMessages(0), 2000);

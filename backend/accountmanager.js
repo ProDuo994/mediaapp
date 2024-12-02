@@ -5,6 +5,7 @@ class User {
     this.username = username;
     this.password = password;
     this.userid = userid;
+    this.description = description;
   }
 
   getAsJSON() {
@@ -20,11 +21,25 @@ class User {
   }
 }
 
+class Account {
+  constructor(DisplayName, Description) {
+    this.DisplayName = DisplayName;
+    this.Description = Description;
+  }
+  getFreinds() {
+    let freinds = [];
+    return freinds;
+  }
+  linkToUser() {
+    let user = "TODO";
+  }
+}
+
 function findUserfromName(username) {
   for (let i = 0; i < Users.length; i++) {
     if (Users[i] == username) {
-      let user = Users[i]
-      return user
+      let user = Users[i];
+      return user;
     }
   }
 }
@@ -90,8 +105,8 @@ function deleteAccount(username) {
 function changePassword(username, currentPassword, newPassword) {
   let account = findUserfromName(username);
   if (account.password != newPassword && newPassword != currentPassword) {
-      account.password = newPassword;
+    account.password = newPassword;
   } else {
-    console.error("Failed to change password")
+    console.error("Failed to change password");
   }
 }

@@ -13,6 +13,16 @@ app.use(
 const port = 3000;
 let activeChats = [];
 
+class Group {
+  constructor(groupName, groupDes, members, owner, isPublic) {
+    this.groupName = groupName;
+    this.groupDes = groupDes;
+    this.members = members;
+    this.owner = owner;
+    this.isPublic = isPublic;
+  }
+}
+
 function checkTokenValid(token) {
   if (token) {
     return true;
@@ -24,21 +34,37 @@ app.post("/login", (req, res) => {
   res.status(200).json({
     message: "login on chatmanager",
   });
-  let token = req.query.token
+  let token = req.query.token;
   if (checkTokenValid(token)) {
     res.status(200);
   } else {
     res.status(401);
   }
 });
+
+function sendMessageToGroup(fullJSONMessage) {
+  if (fullJSONMessage != undefined) {
+    sendMessage(fullJSONMessage);
+  }
+}
+
 app.post("/sendmsg", (req, res) => {
-  let message = sendMessage("sender", "message", "timesent");
-  console.log(message);
-  res.status(200).json(message);
+  let sender = req.query.sender;
+  let message = req.query.message;
+  if (sender != undefined || message != undefined) {
+    let FullMessage = sendMessage(sender, message, "timesent");
+    writeDatabase(FullMessage, "database/servers.json");
+    console.log("[CHATMANAGER/MESSAGE]: " + FullMessage);
+    sendMessageToGroup(FullMessage);
+    res.status(200).json(FullMessage);
+  } else {
+    res.status(400);
+  }
 });
 app.post("/createChat", (req, res) => {
-  res.send("Hello World!");
+  res.send("Creating Chat");
   createChat();
+  res.status(201);
 });
 app.get("/getChatID", (req, res) => {
   const chatID = {
@@ -64,7 +90,7 @@ function readDatabase(name) {
 function writeDatabase(data, name) {
   if (!data) return console.log("No Data found");
   try {
-    const existing = readDatabase();
+    const existing = readDatabase(namw);
     fs.writeFileSync(`${name}_bak.json`, existing);
     fs.writeFileSync(name, JSON.stringify(data));
     console.log("Data saved");
@@ -109,6 +135,10 @@ function createChat(chatName, chatDes, chatOwner) {
     console.log("Name allready exists");
   } else {
     // Add chat to database
+    const newChat = new Group();
+    newChat.groupName = chatName;
+    newChat.owner = chatOwner;
+    newChat.groupDes = chatDes;
     const { database } = JSON.parse(fs.readFileSync("./database.json"));
   }
 }
@@ -139,8 +169,6 @@ function sendMessage(sender, message, timesent) {
   // Sends HTTP protocal to confirm message sent
 }
 app.listen(port, () => {
-  console.log(
-    `Mediapp listening on port ${port}.`
-  );
+  console.log(`Mediapp listening on port ${port}.`);
 });
-app.enable('mediapp server'); // enables the server for simpiler defining and naming
+app.enable("mediapp server"); // enables the server for simpiler defining and naming
