@@ -166,6 +166,7 @@ function loadServerData(serverID) {
 function saveServerData(serverID) {
   let database = "../backend/database.json";
   let currentMessages = getMessagesFromClient();
+  database.messages = currentMessages;
 }
 
 function addFreind(UserID) {
@@ -173,4 +174,4 @@ function addFreind(UserID) {
 }
 
 loadServerData(getChatID(ServerName));
-const msgReceiveInteval = setInterval(pollMessages(0), 2000);
+const msgReceiveInteval = setInterval(pollMessages(0), 1000);

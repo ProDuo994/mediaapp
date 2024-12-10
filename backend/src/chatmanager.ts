@@ -46,16 +46,24 @@ app.post("/sendmsg", (req, res) => {
     let FullMessage = formatMessage(sender, message, 0);
     writeDatabase(FullMessage, "database/servers.json");
     console.log("[CHATMANAGER/MESSAGE]: " + FullMessage);
-    sendMessageToGroup(FullMessage);
+    sendMessageToGroup(FullMessage.myMessage);
     res.status(200).json(FullMessage);
   } else {
     res.status(400);
   }
 });
 app.post("/createChat", (req, res) => {
+  let chatName = req.query['chatName'];
+  let chatDes = req.query['chatDes'];
+  let chatOwner = req.query['chatOwner'];
   res.send("Creating Chat");
-  createChat();
-  res.status(201);
+  if (chatName === undefined) {
+    res.status(400);
+    return false;
+  } else {
+    createChat(chatName, chatDes, chatOwner);
+    res.status(201);
+  }
 });
 app.get("/getChatID", (req, res) => {
   const chatID = { id: "1" };
@@ -160,10 +168,8 @@ function formatMessage(sender: string, message: string, timesent: number) {
     myMessage: fullmessage,
   };
   return { myMessage: fullmessage };
-  // Tells the server when the message is read
-  // Sends HTTP protocal to confirm message sent
 }
 app.listen(port, () => {
   console.log(`Mediapp listening on port ${port}.`);
 });
-app.enable("mediapp server"); // enables the server for simpiler defining and naming
+app.enable("mediapp server");

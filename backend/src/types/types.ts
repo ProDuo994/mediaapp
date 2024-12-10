@@ -17,3 +17,9 @@ export interface Message {
   message: string;
   timesent: number;
 }
+
+export interface User {
+  username: string;
+  password: string;
+  UserID: number;
+}

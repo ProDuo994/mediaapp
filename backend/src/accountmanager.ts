@@ -1,50 +1,20 @@
-let Users = [];
+import { User } from "./types/types";
+import fs from "fs";
 
-class User {
-  constructor(username, password, userid) {
-    this.username = username;
-    this.password = password;
-    this.userid = userid;
-    this.description = description;
-  }
+let Users:User[] = [];
 
-  getAsJSON() {
-    //Returns the account as a JSON
-    return {
-      username: this.username,
-      password: this.password,
-      userid: this.userid,
-    };
-  }
-  delete() {
-    delete this;
-  }
-}
 
-class Account {
-  constructor(DisplayName, Description) {
-    this.DisplayName = DisplayName;
-    this.Description = Description;
-  }
-  getFreinds() {
-    let freinds = [];
-    return freinds;
-  }
-  linkToUser() {
-    let user = "TODO";
-  }
-}
-
-function findUserfromName(username) {
+function findUserfromName(username: string) {
   for (let i = 0; i < Users.length; i++) {
-    if (Users[i] == username) {
+    if (Users[i]?.username == username) {
       let user = Users[i];
       return user;
     }
   }
+  console.error("Could not find account")
 }
 
-function readDatabase(name) {
+function readDatabase(name:string) {
   try {
     const data = fs.readFileSync(name, "utf8");
     return JSON.parse(data);
@@ -54,10 +24,10 @@ function readDatabase(name) {
   }
 }
 
-function writeDatabase(data, name) {
+function writeDatabase(data:string, name:string) {
   if (!data) return console.log("No Data found");
   try {
-    const existing = readDatabase();
+    const existing = readDatabase(name);
     fs.writeFileSync(`${name}_bak.json`, existing);
     fs.writeFileSync(name, JSON.stringify(data));
     console.log("Data saved");
@@ -66,14 +36,14 @@ function writeDatabase(data, name) {
   }
 }
 
-function updateDatabase(updateRecord, name, uid) {
+function updateDatabase(updateRecord:string, name:string, uid:number) {
   const existingData = readDatabase(name);
   if (!existingData) {
     console.error("No Existing Data");
     return;
   }
   const indexToUpdate = existingData.findIndex(
-    (record) => record[uid] == updateRecord[uid]
+    (record:any) => record[uid] == updateRecord[uid]
   );
 
   if (indexToUpdate == -1) {
@@ -90,20 +60,31 @@ function getNewUserId() {
   return 1;
 }
 
-function createAccount(username, password) {
+function createAccount(username:string, password:string) {
   // create account and save it to the JSON file
   const userId = getNewUserId();
-  const newUser = new User(username, password, userId);
-  writeDatabase(newUser, "database/users.json");
+  const newUser:User = {
+    username,
+    password, 
+    UserID: 1};
+  writeDatabase(newUser.username, "database/users.json");
 }
 
-function deleteAccount(username) {
+function deleteAccount(username:string) {
   let account = findUserfromName(username);
+  if (account === undefined) {
+    console.error("Could not find account");
+    return false;
+  }
   account.delete();
 }
 
-function changePassword(username, currentPassword, newPassword) {
+function changePassword(username:string, currentPassword:string, newPassword:string) {
   let account = findUserfromName(username);
+  if (account === undefined) {
+    console.error("Could not find account");
+    return false;
+  }
   if (account.password != newPassword && newPassword != currentPassword) {
     account.password = newPassword;
   } else {

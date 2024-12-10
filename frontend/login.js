@@ -34,6 +34,8 @@ function login(username, password) {
 
 function enryptPassword(password) {
   if (password != null) {
+    password = password;
+    return password;
   } else {
     console.warn("Password not provided");
   }
@@ -41,6 +43,8 @@ function enryptPassword(password) {
 
 function decryptPassword(password) {
   if (password != null) {
+    password = password;
+    return password;
   } else {
     console.warn("Password not provided");
   }
