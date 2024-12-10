@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import fs from "fs";
+import fs, { write } from "fs";
 import { Group, Member, Message } from "./types/types";
 const app = express();
 app.use(express.json());
@@ -46,7 +46,7 @@ app.post("/sendmsg", (req, res) => {
     let FullMessage = formatMessage(sender, message, 0);
     writeDatabase(FullMessage, "database/servers.json");
     console.log("[CHATMANAGER/MESSAGE]: " + FullMessage);
-    sendMessageToGroup(FullMessage.myMessage);
+    sendMessageToGroup(FullMessage.messageObject);
     res.status(200).json(FullMessage);
   } else {
     res.status(400);
@@ -139,7 +139,9 @@ function createChat(chatName: string, chatDes: string, chatOwner: Member) {
       owner: chatOwner,
       isPublic: false,
     };
-    const { database } = JSON.parse(fs.readFileSync("./database.json"));
+    const database = readDatabase("database/servers.json");
+    writeDatabase(newChat.groupName.toString, 'database/servers.json');
+    console.log("New chat created");
   }
 }
 
@@ -162,12 +164,12 @@ function openChannel(num: number) {
 
 function formatMessage(sender: string, message: string, timesent: number) {
   let sendersAccount = sender;
-  let messageTime = timesent;
-  let fullmessage = sendersAccount + ": " + message;
+  let messageTime = Date.now();
+  let fullmessage = timesent + "- " + sendersAccount + ": " + message;
   const messageObject = {
     myMessage: fullmessage,
   };
-  return { myMessage: fullmessage };
+  return { messageObject };
 }
 app.listen(port, () => {
   console.log(`Mediapp listening on port ${port}.`);
