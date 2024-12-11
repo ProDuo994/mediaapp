@@ -36,7 +36,7 @@ function writeDatabase(data:string, name:string) {
   }
 }
 
-function updateDatabase(updateRecord:string, name:string, uid:number) {
+function updateDatabase(updateRecord:any, name:string, uid:number) {
   const existingData = readDatabase(name);
   if (!existingData) {
     console.error("No Existing Data");
@@ -76,7 +76,6 @@ function deleteAccount(username:string) {
     console.error("Could not find account");
     return false;
   }
-  account.delete();
 }
 
 function changePassword(username:string, currentPassword:string, newPassword:string) {

@@ -8,9 +8,7 @@ app.use(
   cors({
     origin: "*",
     credentials: true,
-  })
-);
-
+  }));
 const port = 3000;
 let activeChats: string[] = [];
 
@@ -33,8 +31,7 @@ app.post("/login", (req, res) => {
     res.status(200);
   } else {
     res.status(401);
-  }
-});
+  }});
 
 function sendMessageToGroup(fullJSONMessage: Message) {}
 
@@ -50,8 +47,7 @@ app.post("/sendmsg", (req, res) => {
     res.status(200).json(FullMessage);
   } else {
     res.status(400);
-  }
-});
+  }});
 app.post("/createChat", (req, res) => {
   let chatName = req.query['chatName'];
   let chatDes = req.query['chatDes'];
@@ -63,8 +59,7 @@ app.post("/createChat", (req, res) => {
   } else {
     createChat(chatName, chatDes, chatOwner);
     res.status(201);
-  }
-});
+  }});
 app.get("/getChatID", (req, res) => {
   const chatID = { id: "1" };
   res.send(chatID);
@@ -81,8 +76,7 @@ function readDatabase(name: string) {
   } catch {
     console.error("Could not read database");
     return null;
-  }
-}
+  }}
 
 function writeDatabase(data: object, name: string) {
   if (!data) return console.log("No Data found");
@@ -93,8 +87,7 @@ function writeDatabase(data: object, name: string) {
     console.log("Data saved");
   } catch {
     console.error("Failed to write to database");
-  }
-}
+  }}
 
 function updateDatabase(updateRecord: string[], name: string, uid: number) {
   const existingData = readDatabase(name);
@@ -102,10 +95,7 @@ function updateDatabase(updateRecord: string[], name: string, uid: number) {
     console.error("No Existing Data");
     return;
   }
-  const indexToUpdate = existingData.findIndex(
-    (record: string) => record[uid] == updateRecord[uid]
-  );
-
+  const indexToUpdate = existingData.findIndex((record: string) => record[uid] == updateRecord[uid]);
   if (indexToUpdate == -1) {
     console.error("Record not foundation for update");
     return;
@@ -127,11 +117,10 @@ app.get("/getChatMessages", (req, res) => {
 });
 
 function createChat(chatName: string, chatDes: string, chatOwner: Member) {
-  let exists = activeChats.find(chatName);
+  let exists = activeChats.find(chatName.toString);
   if (exists) {
     console.log("Name allready exists");
   } else {
-    // Add chat to database
     const newChat: Group = {
       groupName: chatName,
       groupDescription: chatDes,
@@ -142,11 +131,10 @@ function createChat(chatName: string, chatDes: string, chatOwner: Member) {
     const database = readDatabase("database/servers.json");
     writeDatabase(newChat.groupName.toString, 'database/servers.json');
     console.log("New chat created");
-  }
-}
+  }}
 
 function deleteChat(chatID: number) {
-  let servers = "database/servers.json";
+  let servers = readDatabase("database/servers.json");
 }
 
 function getChatMembers(chatID: number) {
@@ -166,9 +154,11 @@ function formatMessage(sender: string, message: string, timesent: number) {
   let sendersAccount = sender;
   let messageTime = Date.now();
   let fullmessage = timesent + "- " + sendersAccount + ": " + message;
-  const messageObject = {
-    myMessage: fullmessage,
-  };
+  const messageObject: Message = {
+    sender: sendersAccount,
+    message: message,
+    timesent: messageTime
+  }
   return { messageObject };
 }
 app.listen(port, () => {
