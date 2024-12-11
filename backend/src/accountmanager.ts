@@ -83,10 +83,13 @@ function changePassword(username:string, currentPassword:string, newPassword:str
   if (account === undefined) {
     console.error("Could not find account");
     return false;
+  } else {
+    console.error("Failed to change password")
   }
   if (account.password != newPassword && newPassword != currentPassword) {
     account.password = newPassword;
+    return true;
   } else {
-    console.error("Failed to change password");
+    console.error("Failed to change password")
   }
 }

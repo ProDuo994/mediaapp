@@ -23,3 +23,10 @@ export interface User {
   password: string;
   UserID: number;
 }
+
+export interface Permissions {
+  canMessage: boolean;
+  canDeleteMessages: boolean;
+  admin: boolean;
+  createRank: boolean;
+}

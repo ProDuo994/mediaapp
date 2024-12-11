@@ -57,7 +57,7 @@ app.post("/createChat", (req, res) => {
     res.status(400);
     return false;
   } else {
-    createChat(chatName, chatDes, chatOwner);
+    createChat(chatName as string, chatDes as string, chatOwner as Member);
     res.status(201);
   }});
 app.get("/getChatID", (req, res) => {
