@@ -9,10 +9,8 @@ function findUserfromName(username: string) {
     if (Users[i]?.username == username) {
       let user = Users[i];
       return user;
-    }
-  }
-  console.error("Could not find account")
-}
+    }}
+  console.error("Could not find account")}
 
 function readDatabase(name:string) {
   try {
@@ -21,8 +19,7 @@ function readDatabase(name:string) {
   } catch {
     console.error("Could not read database");
     return null;
-  }
-}
+  }}
 
 function writeDatabase(data:string, name:string) {
   if (!data) return console.log("No Data found");
@@ -33,8 +30,7 @@ function writeDatabase(data:string, name:string) {
     console.log("Data saved");
   } catch {
     console.error("Failed to write to database'");
-  }
-}
+  }}
 
 function updateDatabase(updateRecord:any, name:string, uid:number) {
   const existingData = readDatabase(name);
@@ -85,8 +81,7 @@ function changePassword(username:string, currentPassword:string, newPassword:str
     return false;
   } else {
     console.error("Failed to change password")
-  }
-  if (account.password != newPassword && newPassword != currentPassword) {
+  } if (account.password != newPassword && newPassword != currentPassword) {
     account.password = newPassword;
     return true;
   } else {

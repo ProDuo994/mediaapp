@@ -13,7 +13,7 @@ const port = 3000;
 let activeChats: string[] = [];
 
 function checkTokenValid(token: string) {
-  if (token) {
+  if (token !== null) {
     return true;
   }
   return false;
@@ -49,20 +49,22 @@ app.post("/sendmsg", (req, res) => {
     res.status(400);
   }});
 app.post("/createChat", (req, res) => {
-  let chatName = req.query['chatName'];
-  let chatDes = req.query['chatDes'];
+  let chatName = req.query['chatName']?.toString;
+  let chatDes = req.query['chatDes']?.toString;
   let chatOwner = req.query['chatOwner'];
   res.send("Creating Chat");
   if (chatName === undefined) {
     res.status(400);
+    console.error("Could not create chat: " + chatName)
     return false;
   } else {
-    createChat(chatName as string, chatDes as string, chatOwner as Member);
+    createChat(chatName, chatDes, chatOwner);
     res.status(201);
   }});
 app.get("/getChatID", (req, res) => {
   const chatID = { id: "1" };
   res.send(chatID);
+  res.status(200);
 });
 app.get("/getChannelMessageServer", (req, res) => {
   const chatMessages = readDatabase("database/servers.json");
@@ -114,6 +116,7 @@ app.get("/getChatMessages", (req, res) => {
   }
   const chatMessages = readDatabase("database/servers.json");
   res.send(chatMessages);
+  res.status(200);
 });
 
 function createChat(chatName: string, chatDes: string, chatOwner: Member) {
