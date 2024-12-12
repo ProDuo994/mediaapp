@@ -108,27 +108,32 @@ function getMessageFromServer(serverID) {
 }
 
 function getChannelMessageServer(name) {
+  if (name === undefined) {
+    return false; }
   fetch(`${server}/getChannelMessageServer`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
       "X-Content-Type-Options": "nosniff",
-    },
-  }).then((res) => {
-    res.json().then((json) => (chatMessagesFromServer = res));
-  });
+    },})
+    .then((res) => {
+    res.json().then((json) => (chatMessagesFromServer = res));});
 }
 
 function getMessagesFromClient() {
   let messages = {
-    Admin: "Hello",
-  };
+    Admin: "Hello",};
   return messages;
 }
 
-function pollMessages(serverID) {
-  const savedMessages = getMessageFromServer(serverID)
-    .then((res) => {
+function pollMessages(serverID) { 
+  fetch(`${server}/getChannelMessageServer`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Content-Type-Options": "nosniff",
+    },})
+ .then((res) => {
       const server1 = res["SERVER 1"];
       const channel1Messages = server1["Channel 1"].messages;
       if (channel1Messages.length > lastAmountOfMessages) {
@@ -136,15 +141,10 @@ function pollMessages(serverID) {
           createAndAppend(
             "p",
             messageViewBox,
-            message.username + ": " + message.message
-          );
-        }
-        lastAmountOfMessages = channel1Messages.length;
-      }
-    })
+            message.username + ": " + message.message);}
+        lastAmountOfMessages = channel1Messages.length;}})
     .catch((err) => {
-      console.error(err);
-    });
+      console.error(err);});
   // Save messages in current chat to server
   saveServerData(getChatID(ServerName));
 }
@@ -156,8 +156,7 @@ messageBoxInput.addEventListener("keydown", (event) => {
     createAndAppend("p", messageViewBox, accountName + ": " + message);
     messageHistory.push(message);
     sendMessage(accountName, message, time);
-  }
-});
+  }});
 
 function loadServerData(serverID) {
   let database = "../backend/database.json";

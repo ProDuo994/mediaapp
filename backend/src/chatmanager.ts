@@ -49,8 +49,8 @@ app.post("/sendmsg", (req, res) => {
     res.status(400);
   }});
 app.post("/createChat", (req, res) => {
-  let chatName = req.query['chatName']?.toString;
-  let chatDes = req.query['chatDes']?.toString;
+  let chatName = req.query['chatName']?;
+  let chatDes = req.query['chatDes']?;
   let chatOwner = req.query['chatOwner'];
   res.send("Creating Chat");
   if (chatName === undefined) {
