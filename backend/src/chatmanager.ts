@@ -22,34 +22,33 @@ function checkTokenValid(token: string) {
 }
 
 app.post("/login", (req, res) => {
-  res.status(200).json({
-    message: "login on chatmanager",
-  });
+  let username = req.query["username"];
+  let password = req.query["password"];
   let token = req.query["token"];
-  if (token === undefined) {
-    res.status(400);
-  }
-  if (checkTokenValid(token as string)) {
-    res.status(200);
+  if (username === "admin.admin" && password === "password") {
+    if (token === undefined) {
+      return res.status(400);
+    } if (checkTokenValid(token as string)) {
+      return res.status(200).send("Acess Granted")
   } else {
-    res.status(401);
+   res.status(401).send("Acess Denied")
   }
 });
 
 function sendMessageToGroup(fullJSONMessage: string) {}
 
 app.post("/sendmsg", (req, res) => {
-  let sender = req.body.sender;
-  let message = req.body.message;
+  let sender:string = req.body.sender;
+  let message:string = req.body.message;
   console.log(sender);
   if (sender !== undefined && message !== undefined) {
-    let FullMessage = formatMessage(sender, message, 0);
-    writeDatabase(FullMessage, "database/servers.json");
-    console.log("[CHATMANAGER/MESSAGE]: " + FullMessage);
-    sendMessageToGroup(FullMessage.myMessage);
-    res.status(200).json(FullMessage);
+    let fullMessage = formatMessage(sender, message, 0);
+    writeDatabase(fullMessage, "database/servers.json");
+    console.log("[CHATMANAGER/MESSAGE]: " + fullMessage);
+    sendMessageToGroup(fullMessage.myMessage);
+    return res.status(200).json(fullMessage);
   } else {
-    res.status(400);
+    return res.status(400);
   }
 });
 
@@ -85,7 +84,7 @@ app.post("/createChat", (req, res) => {
   let chatOwner = req.query["chatOwner"];
 
   if (!chatName || !chatDescription || !chatOwner) {
-    res.status(400).send("Chat name or chat description not provided.");
+    return res.status(400).send("Chat name or chat description not provided.");
   } else {
     createChat(
       chatName as string,
@@ -93,7 +92,7 @@ app.post("/createChat", (req, res) => {
       chatOwner as unknown as Member
     );
     res.send("Creating Chat");
-    res.status(201);
+    return res.status(201);
   }
 });
 app.get("/getChatID", (req, res) => {
@@ -150,8 +149,7 @@ function updateDatabase(updateRecord: string[], name: string, uid: number) {
 app.get("/getChatMessages", (req, res) => {
   let serverID = req.query["serverID"];
   if (serverID == undefined) {
-    res.status(400);
-    return;
+    return res.status(400);
   }
   const chatMessages = readDatabase("database/servers.json");
   res.send(chatMessages);
@@ -188,4 +186,3 @@ function formatMessage(sender: string, message: string, timesent: number) {
 app.listen(port, () => {
   console.log(`Mediapp listening on port ${port}.`);
 });
-app.enable("mediapp server"); // enables the server for simpiler defining and naming
