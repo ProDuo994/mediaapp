@@ -30,3 +30,7 @@ export interface Permissions {
   admin: boolean;
   createRank: boolean;
 }
+
+export interface Database {
+  members: Member[];
+}

@@ -1,7 +1,14 @@
 {
-  "ADMIN": {
-    "username": "admin.admin",
-    "password": "password",
-    "userid": 1
+  "Members": {
+    "ADMIN": {
+      "username": "admin.admin",
+      "password": "password",
+      "userid": 1
+    },
+    "Ben S": {
+      "username": "benjamin.speechley",
+      "password": "password",
+      "userid": 2
+    }
   }
 }

@@ -1,19 +1,21 @@
 import express from "express";
 import cors from "cors";
-import fs, { write } from "fs";
-import { Group, Member, Message } from "./types/types";
+import fs from "fs";
+import { Group, Member, Message, Database } from "./types/types";
 const app = express();
 app.use(express.json());
 app.use(
   cors({
     origin: "*",
     credentials: true,
-  }));
+  })
+);
+
 const port = 3000;
 let activeChats: string[] = [];
 
 function checkTokenValid(token: string) {
-  if (token !== null) {
+  if (token) {
     return true;
   }
   return false;
@@ -31,9 +33,10 @@ app.post("/login", (req, res) => {
     res.status(200);
   } else {
     res.status(401);
-  }});
+  }
+});
 
-function sendMessageToGroup(fullJSONMessage: Message) {}
+function sendMessageToGroup(fullJSONMessage: string) {}
 
 app.post("/sendmsg", (req, res) => {
   let sender = req.body.sender;
@@ -43,42 +46,74 @@ app.post("/sendmsg", (req, res) => {
     let FullMessage = formatMessage(sender, message, 0);
     writeDatabase(FullMessage, "database/servers.json");
     console.log("[CHATMANAGER/MESSAGE]: " + FullMessage);
-    sendMessageToGroup(FullMessage.messageObject);
+    sendMessageToGroup(FullMessage.myMessage);
     res.status(200).json(FullMessage);
   } else {
     res.status(400);
-  }});
+  }
+});
+
+function usernameToMember(username: string): Member {
+  // TODO: Find username
+  let database = readDatabase('database/users.json');
+  let usernameInDatabase = database.members.find();
+  const member:Member = {
+    username: usernameInDatabase,
+    displayName: ,
+    userID: 
+  };
+  return member
+}
+
+function createChat(chatName: string, chatDes: string, chatOwner: Member) {
+  let exists = activeChats.find(chatName.toString);
+  if (exists) {
+    console.log("Name allready exists");
+  } else 
+    const newChat: Group = {
+      groupName: chatName,
+      groupDescription: chatDes,
+      members: [],
+      owner: chatOwner,
+      isPublic: false,
+    };
+}
+
 app.post("/createChat", (req, res) => {
-  let chatName = req.query['chatName']?;
-  let chatDes = req.query['chatDes']?;
-  let chatOwner = req.query['chatOwner'];
-  res.send("Creating Chat");
-  if (chatName === undefined) {
-    res.status(400);
-    console.error("Could not create chat: " + chatName)
-    return false;
+  let chatName = req.query["chatName"];
+  let chatDescription = req.query["chatDes"];
+  let chatOwner = req.query["chatOwner"];
+
+  if (!chatName || !chatDescription || !chatOwner) {
+    res.status(400).send("Chat name or chat description not provided.");
   } else {
-    createChat(chatName, chatDes, chatOwner);
+    createChat(
+      chatName as string,
+      chatDescription as string,
+      chatOwner as unknown as Member
+    );
+    res.send("Creating Chat");
     res.status(201);
-  }});
+  }
+});
 app.get("/getChatID", (req, res) => {
   const chatID = { id: "1" };
   res.send(chatID);
-  res.status(200);
 });
 app.get("/getChannelMessageServer", (req, res) => {
   const chatMessages = readDatabase("database/servers.json");
   res.send(chatMessages);
 });
 
-function readDatabase(name: string) {
+function readDatabase(name: string): Database {
   try {
     const data = fs.readFileSync(name, "utf8");
     return JSON.parse(data);
   } catch {
     console.error("Could not read database");
     return null;
-  }}
+  }
+}
 
 function writeDatabase(data: object, name: string) {
   if (!data) return console.log("No Data found");
@@ -89,7 +124,8 @@ function writeDatabase(data: object, name: string) {
     console.log("Data saved");
   } catch {
     console.error("Failed to write to database");
-  }}
+  }
+}
 
 function updateDatabase(updateRecord: string[], name: string, uid: number) {
   const existingData = readDatabase(name);
@@ -97,7 +133,10 @@ function updateDatabase(updateRecord: string[], name: string, uid: number) {
     console.error("No Existing Data");
     return;
   }
-  const indexToUpdate = existingData.findIndex((record: string) => record[uid] == updateRecord[uid]);
+  const indexToUpdate = existingData.findIndex(
+    (record: string) => record[uid] == updateRecord[uid]
+  );
+
   if (indexToUpdate == -1) {
     console.error("Record not foundation for update");
     return;
@@ -116,28 +155,10 @@ app.get("/getChatMessages", (req, res) => {
   }
   const chatMessages = readDatabase("database/servers.json");
   res.send(chatMessages);
-  res.status(200);
 });
 
-function createChat(chatName: string, chatDes: string, chatOwner: Member) {
-  let exists = activeChats.find(chatName.toString);
-  if (exists) {
-    console.log("Name allready exists");
-  } else {
-    const newChat: Group = {
-      groupName: chatName,
-      groupDescription: chatDes,
-      members: [],
-      owner: chatOwner,
-      isPublic: false,
-    };
-    const database = readDatabase("database/servers.json");
-    writeDatabase(newChat.groupName.toString, 'database/servers.json');
-    console.log("New chat created");
-  }}
-
 function deleteChat(chatID: number) {
-  let servers = readDatabase("database/servers.json");
+  let servers = "database/servers.json";
 }
 
 function getChatMembers(chatID: number) {
@@ -155,16 +176,16 @@ function openChannel(num: number) {
 
 function formatMessage(sender: string, message: string, timesent: number) {
   let sendersAccount = sender;
-  let messageTime = Date.now();
-  let fullmessage = timesent + "- " + sendersAccount + ": " + message;
-  const messageObject: Message = {
-    sender: sendersAccount,
-    message: message,
-    timesent: messageTime
-  }
-  return { messageObject };
+  let messageTime = timesent;
+  let fullmessage = sendersAccount + ": " + message;
+  const messageObject = {
+    myMessage: fullmessage,
+  };
+  return { myMessage: fullmessage };
+  // Tells the server when the message is read
+  // Sends HTTP protocal to confirm message sent
 }
 app.listen(port, () => {
   console.log(`Mediapp listening on port ${port}.`);
 });
-app.enable("mediapp server");
+app.enable("mediapp server"); // enables the server for simpiler defining and naming

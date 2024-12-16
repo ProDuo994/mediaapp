@@ -1,12 +1,10 @@
 const server = "http://192.168.2.71:3000";
 
 function processLogin(loginInfo, username, password) {
-  console.log(loginInfo);
   if (username == "admin.admin" && password == "password") {
     window.location.href = "chat.html";
   } else {
     window.alert("Username or Password incorrect!");
-    console.log("nuh uh");
   }
 }
 
