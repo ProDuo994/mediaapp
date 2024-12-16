@@ -24,5 +24,31 @@
         }
       ]
     }
+  },
+  "SERVER 2": {
+    "Channel 1": {
+      "messages": [
+        {
+          "username": "Ben",
+          "message": "hello world"
+        },
+        {
+          "username": "Other Ben",
+          "message": "a"
+        },
+        {
+          "username": "Copy of Ben",
+          "message": "b"
+        },
+        {
+          "username": "Yet Another Copy of Ben",
+          "message": "b"
+        },
+        {
+          "username": "Copy of Ben",
+          "message": "b"
+        }
+      ]
+    }
   }
 }

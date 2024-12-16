@@ -28,7 +28,7 @@
   <script>
     messageBoxInput.addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
-        login();
+        login(document.getElementById('usrname').value, document.getElementById('pswrd').value);
       }
     });
   </script>

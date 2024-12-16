@@ -8,9 +8,7 @@ app.use(
   cors({
     origin: "*",
     credentials: true,
-  })
-);
-
+  }));
 const port = 3000;
 let activeChats: string[] = [];
 
@@ -32,8 +30,7 @@ app.post("/login", (req, res) => {
       return res.status(200).send("Acess Granted")
   } else {
    res.status(401).send("Acess Denied")
-  }
-});
+  }});
 
 function sendMessageToGroup(fullJSONMessage: string) {}
 
@@ -49,13 +46,12 @@ app.post("/sendmsg", (req, res) => {
     return res.status(200).json(fullMessage);
   } else {
     return res.status(400);
-  }
-});
+  }});
 
 function usernameToMember(username: string): Member {
   // TODO: Find username
   let database = readDatabase('database/users.json');
-  let usernameInDatabase = database.members.find();
+  let usernameInDatabase = database.members.find(username);
   const member:Member = {
     username: usernameInDatabase,
     displayName: ,
@@ -93,8 +89,7 @@ app.post("/createChat", (req, res) => {
     );
     res.send("Creating Chat");
     return res.status(201);
-  }
-});
+  }});
 app.get("/getChatID", (req, res) => {
   const chatID = { id: "1" };
   res.send(chatID);
@@ -111,8 +106,7 @@ function readDatabase(name: string): Database {
   } catch {
     console.error("Could not read database");
     return null;
-  }
-}
+  }}
 
 function writeDatabase(data: object, name: string) {
   if (!data) return console.log("No Data found");
@@ -123,8 +117,7 @@ function writeDatabase(data: object, name: string) {
     console.log("Data saved");
   } catch {
     console.error("Failed to write to database");
-  }
-}
+  }}
 
 function updateDatabase(updateRecord: string[], name: string, uid: number) {
   const existingData = readDatabase(name);
