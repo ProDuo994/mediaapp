@@ -12,6 +12,19 @@ app.use(
 const port = 3000;
 let activeChats: string[] = [];
 
+function findInDatabase(database:string, item:string) {
+  if (!database || !item) {
+    return console.error("Args not provided");
+  }
+  let account;
+  // TODO: Implement sorting algorithim
+  if (item.startsWith("a") || item.startsWith("b") || item.startsWith("c") || item.startsWith("d")) {
+    return account;
+  } else {
+
+  }
+}
+
 function checkTokenValid(token: string) {
   if (token) {
     return true;
@@ -19,10 +32,11 @@ function checkTokenValid(token: string) {
   return false;
 }
 
-app.post("/login", (req, res) => {
+app.post("/login", (req:any, res:any) => {
   let username = req.query["username"];
   let password = req.query["password"];
   let token = req.query["token"];
+  let account = findInDatabase();
   if (username === "admin.admin" && password === "password") {
     if (token === undefined) {
       return res.status(400);
@@ -34,7 +48,7 @@ app.post("/login", (req, res) => {
 
 function sendMessageToGroup(fullJSONMessage: string) {}
 
-app.post("/sendmsg", (req, res) => {
+app.post("/sendmsg", (req:any, res:any) => {
   let sender:string = req.body.sender;
   let message:string = req.body.message;
   console.log(sender);
@@ -74,11 +88,10 @@ function createChat(chatName: string, chatDes: string, chatOwner: Member) {
     };
 }
 
-app.post("/createChat", (req, res) => {
+app.post("/createChat", (req:any, res:any) => {
   let chatName = req.query["chatName"];
   let chatDescription = req.query["chatDes"];
   let chatOwner = req.query["chatOwner"];
-
   if (!chatName || !chatDescription || !chatOwner) {
     return res.status(400).send("Chat name or chat description not provided.");
   } else {
@@ -90,11 +103,11 @@ app.post("/createChat", (req, res) => {
     res.send("Creating Chat");
     return res.status(201);
   }});
-app.get("/getChatID", (req, res) => {
+app.get("/getChatID", (req:any, res:any) => {
   const chatID = { id: "1" };
   res.send(chatID);
 });
-app.get("/getChannelMessageServer", (req, res) => {
+app.get("/getChannelMessageServer", (req:any, res:any) => {
   const chatMessages = readDatabase("database/servers.json");
   res.send(chatMessages);
 });
@@ -105,7 +118,6 @@ function readDatabase(name: string): Database {
     return JSON.parse(data);
   } catch {
     console.error("Could not read database");
-    return null;
   }}
 
 function writeDatabase(data: object, name: string) {
@@ -120,15 +132,12 @@ function writeDatabase(data: object, name: string) {
   }}
 
 function updateDatabase(updateRecord: string[], name: string, uid: number) {
-  const existingData = readDatabase(name);
+  const existingData:Database = readDatabase(name);
   if (!existingData) {
     console.error("No Existing Data");
     return;
   }
-  const indexToUpdate = existingData.findIndex(
-    (record: string) => record[uid] == updateRecord[uid]
-  );
-
+  const indexToUpdate = existingData.findIndex((record: string) => record[uid] == updateRecord[uid]);
   if (indexToUpdate == -1) {
     console.error("Record not foundation for update");
     return;
@@ -139,7 +148,7 @@ function updateDatabase(updateRecord: string[], name: string, uid: number) {
   };
 }
 
-app.get("/getChatMessages", (req, res) => {
+app.get("/getChatMessages", (req:any, res:any) => {
   let serverID = req.query["serverID"];
   if (serverID == undefined) {
     return res.status(400);
@@ -169,13 +178,9 @@ function formatMessage(sender: string, message: string, timesent: number) {
   let sendersAccount = sender;
   let messageTime = timesent;
   let fullmessage = sendersAccount + ": " + message;
-  const messageObject = {
-    myMessage: fullmessage,
-  };
-  return { myMessage: fullmessage };
+  const messageObject = {myMessage: fullmessage,};
+  return messageObject;
   // Tells the server when the message is read
   // Sends HTTP protocal to confirm message sent
 }
-app.listen(port, () => {
-  console.log(`Mediapp listening on port ${port}.`);
-});
+app.listen(port, () => { console.log(`Mediapp listening on port ${port}.`);});
