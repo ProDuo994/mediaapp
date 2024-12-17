@@ -19,7 +19,7 @@ function findInDatabase(database:string, item:string) {
   let account;
   // TODO: Implement sorting algorithim
   if (item.startsWith("a") || item.startsWith("b") || item.startsWith("c") || item.startsWith("d")) {
-    return account;
+    return account; 
   } else {
 
   }
