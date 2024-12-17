@@ -1,0 +1,20 @@
+{
+  "accounts": {
+    "admin.admin": {
+      "password": "hashed password"
+    }
+  },
+
+  "groups": {
+    "group1": {
+      "name": "",   
+      "des": "",
+      "members": {},
+      "roles": {
+        "member": "",
+        "admin": "",
+        "owner": ""
+      }
+    }
+  }
+}
