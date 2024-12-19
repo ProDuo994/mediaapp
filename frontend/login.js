@@ -1,4 +1,4 @@
-const server = "http://192.168.2.50:3000";
+const server = "http://192.168.68.113:3000";
 
 function processLogin() {
   window.location.href = "chat.html";
@@ -9,17 +9,13 @@ function login(username, password) {
     `${server}/login?${new URLSearchParams({
       username,
       password,
-      token: "a",
-    })}`,
-    {
-      // Send server packet
+      token: "a", })}`, {
       method: "POST", // HTTP protocal being used
       headers: {
         "Content-Type": "application/json",
         "X-Content-Type-Options": "nosniff",
       },
       body: JSON.stringify({
-        //Info sent to server
         username,
         password,
       }),

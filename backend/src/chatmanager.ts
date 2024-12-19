@@ -41,6 +41,7 @@ app.post("/login", (req: any, res: any) => {
   let username = req.query["username"];
   let password = req.query["password"];
   let token = req.query["token"];
+  console.log(username + password)
   let account = findAccountInDatabase(username, "database/users.json");
   // TODO: Create token logic
   if (!account) {
@@ -50,10 +51,11 @@ app.post("/login", (req: any, res: any) => {
     account.username = username;
     account.displayName = username;
     account.userID = 1;
-
-    return res.status(200).json({ message: "ok" });
+    res.status(200);
+    return
   } else {
     console.log(username, password);
+    return;
   }
 });
 
@@ -221,13 +223,13 @@ app.get("/server", (req: any, res: any) => {
 });
 
 function addNewAccountToDatabase(databaseName: string, newAccount: Account) {
-  const database: Database = readDatabase(databaseName);
-  if (!database) {
+  const database: string = "todo"
+  if (database === null) {
     console.error("No Existing Data");
     return;
   }
-  database.accounts.push(newAccount);
-  writeDatabase(database, databaseName);
+  //database.accounts.push(newAccount);
+  //writeDatabase(database, databaseName);
 }
 
 function findAccountInDatabase(username: string, databaseName: string) {
@@ -238,6 +240,14 @@ function findAccountInDatabase(username: string, databaseName: string) {
   const database = readDatabase(databaseName);
   if (!database) {
     return null;
+  }
+  if (database === undefined) {
+    let account:Account = {
+      username,
+      displayName: username,
+      userID: 2
+    };
+    return account;
   }
   const account = database.accounts.find((elem) => elem.username === username);
   return account;
