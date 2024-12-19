@@ -1,6 +1,12 @@
 {
   "SERVER 1": {
     "Channel 1": {
+      "Settings": {
+        "serverName": "",
+        "serverDes": "",
+        "visible": true,
+        "canMessage": true
+      },
       "messages": [
         {
           "username": "Ben",

@@ -1,12 +1,12 @@
 export interface Group {
   groupName: string;
   groupDescription: string;
-  members: Member[];
-  owner: Member;
+  members: Account[];
+  owner: Account;
   isPublic: boolean;
 }
 
-export interface Member {
+export interface Account {
   username: string;
   displayName: string;
   userID: number;
@@ -32,5 +32,6 @@ export interface Permissions {
 }
 
 export interface Database {
-  members: Member[];
+  accounts: Account[];
+  messages: Message[];
 }

@@ -10,7 +10,7 @@ function findUserfromName(username: string) {
       return user;
     }
   }
-  console.error("Could not find account");
+  return console.error("Could not find account");
 }
 
 function readDatabase(name: string) {
@@ -72,8 +72,7 @@ function createAccount(username: string, password: string) {
 function deleteAccount(username: string) {
   let account = findUserfromName(username);
   if (account === undefined) {
-    console.error("Could not find account");
-    return false;
+    return console.error("Could not find account");
   }
 }
 
@@ -93,6 +92,6 @@ function changePassword(
     account.password = newPassword;
     return true;
   } else {
-    console.error("Failed to change password");
+    return console.error("Failed to change password");
   }
 }

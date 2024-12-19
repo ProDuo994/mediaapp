@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Funnel+Sans:ital,wght@0,300..800;1,300..800&display=swap");
+
 * {
   margin: 0;
   box-sizing: border-box;
@@ -6,9 +8,8 @@
 body,
 html {
   height: 100%;
-}
-
-@media screen and (max-width: 600px) {
+  font-family: "Funnel Sans", "Gill Sans", "Gill Sans MT", Calibri,
+    "Trebuchet MS", sans-serif;
 }
 
 header {
@@ -83,6 +84,7 @@ body {
   background-color: blueviolet;
   font-family: monospace;
   align-items: center;
+  height: 60px;
 }
 
 .menuButton {
@@ -90,16 +92,14 @@ body {
 }
 
 .memberList {
-  text-align: center;
-  font-family: monospace;
   background-color: rgb(63, 109, 110);
-  height: 700px;
+  height: 100%;
   width: 150px;
   border: solid transparent;
   box-sizing: border-box;
   overflow-x: hidden;
-  padding-top: .5rem;
-  padding-bottom: .5rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
   overflow-y: auto;
 }
 
@@ -116,9 +116,11 @@ body {
 }
 
 .channelList {
-  height: 500px;
+  height: 100%;
   width: 150px;
   background-color: rgb(63, 109, 110);
+  display: flex;
+  flex-direction: column;
 }
 
 .channelList a {
@@ -131,15 +133,23 @@ body {
   color: skyblue;
 }
 
-.channelHeader,
-.messageBox {
-  height: 10%;
+.channelHeader {
+  display: flex;
+  height: 6%;
+  border-width: 3px;
+  border-color: black;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .channelMessages {
-  height: 80%;
+  height: 89%;
   overflow-y: auto;
   overflow-x: hidden;
+}
+
+.messageBox {
+  height: 5%;
 }
 
 .messageBox input {
@@ -147,6 +157,7 @@ body {
   width: 100%;
   border: none;
   color: white;
+  height: 100%;
 }
 
 .profilepic {
@@ -183,9 +194,8 @@ body {
   display: none;
   position: absolute;
   background-color: blueviolet;
-  min-width: 100px;
-  left: 0;
-  margin-left: 1615px;
+  width: 200px;
+  right: 150px;
 }
 
 .account:hover .accountPage {
@@ -209,7 +219,42 @@ body {
   background-color: blueviolet;
 }
 
-.freindbutton {
+.friendbutton {
   background-color: lightblue;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.channelAdd {
+  background-color: rgb(122, 191, 214);
+  align-self: center;
+}
+
+.channelSettings {
+  background-color: rgb(122, 191, 214);
+}
+
+#newChannelDialog {
+  margin: auto;
+}
+
+#channelSettingsGUI {
+  margin: auto;
+}
+
+.newChannelDialog {
+  background-color: aqua;
+}
+
+@media screen and (max-width: 600px) {
+  .channelList {
+    width: 100px;
+  }
+
+  .mainArea {
+    width: calc(100% - 150px);
+  }
+
+  .memberList {
+    width: 150px;
+  }
 }
