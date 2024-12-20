@@ -41,18 +41,26 @@ app.post("/login", (req: any, res: any) => {
   let username = req.query["username"];
   let password = req.query["password"];
   let token = req.query["token"];
-  console.log(username + password)
+  console.log(username + password);
   let account = findAccountInDatabase(username, "database/users.json");
+  if (account === undefined) {
+    account = {
+      username: "none",
+      displayName: "none",
+      userID: 0,
+    };
+    return res.status(200).send("[CHATMANAGER]: None account set");
+  }
   // TODO: Create token logic
-  if (!account) {
-    return res.status(400);
+  if (account === undefined) {
+    return res.status(400).send("Could not find account");
   }
   if (username === "admin.admin" && password === "password") {
     account.username = username;
     account.displayName = username;
     account.userID = 1;
     res.status(200);
-    return
+    return;
   } else {
     console.log(username, password);
     return;
@@ -89,7 +97,7 @@ function sendMessageToGroup(message: Message) {}
 app.post("/sendmsg", (req: any, res: any) => {
   let sender: string = req.body.sender;
   let message: string = req.body.message;
-  let account = findAccountInDatabase(sender, "database/users.json");
+  let account = findAccountInDatabase(sender, "database/users");
   if (account && account.displayName === undefined) {
     account.displayName = account.username;
   }
@@ -223,7 +231,7 @@ app.get("/server", (req: any, res: any) => {
 });
 
 function addNewAccountToDatabase(databaseName: string, newAccount: Account) {
-  const database: string = "todo"
+  const database: string = "todo";
   if (database === null) {
     console.error("No Existing Data");
     return;
@@ -235,21 +243,18 @@ function addNewAccountToDatabase(databaseName: string, newAccount: Account) {
 function findAccountInDatabase(username: string, databaseName: string) {
   if (!username) {
     console.error("Username not provided");
-    return null;
+    return undefined;
   }
   const database = readDatabase(databaseName);
+  console.log(database?.accounts);
   if (!database) {
-    return null;
+    return undefined;
   }
-  if (database === undefined) {
-    let account:Account = {
-      username,
-      displayName: username,
-      userID: 2
-    };
-    return account;
+  if (database === undefined || database.accounts === undefined) {
+    return undefined;
   }
-  const account = database.accounts.find((elem) => elem.username === username);
+  const accountList: Account[] = database.accounts;
+  let account = accountList.find((elem) => elem.username === username);
   return account;
 }
 

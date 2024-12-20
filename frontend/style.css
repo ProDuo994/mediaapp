@@ -224,6 +224,10 @@ body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
+.profilepanelname {
+  text-align: center;
+}
+
 .channelAdd {
   background-color: rgb(122, 191, 214);
   align-self: center;
@@ -231,6 +235,10 @@ body {
 
 .channelSettings {
   background-color: rgb(122, 191, 214);
+}
+
+.panelheader {
+  text-align: center;
 }
 
 #newChannelDialog {

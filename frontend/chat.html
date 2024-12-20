@@ -5,6 +5,8 @@
     <title>Chat | MEDIAPP</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="style.css" />
+    <base href="index.html">
+    <link rel="icon" type="image/x-icon" href="/frontend/images/favicon.png">
   </head>
   <body>
     <noscript>
@@ -61,7 +63,7 @@
     </div>
     <div class="mainDisplay">
       <div class="channelList">
-        <h2>Channels</h2>
+        <h2 class="panelheader">Channels</h2>
         <br />
         <a href="#" id="channel1">Channel 1</a>
         <br />
@@ -83,11 +85,11 @@
         </div>
       </div>
       <div class="memberList">
-        <h2>Server Members</h2>
+        <h2 class="panelheader">Server Members</h2>
         <br />
         <div class="account" id="account">
           <img src="images/account(1).jpeg" alt="p" class="profilepic" />
-          <h4>Your Name</h4>
+          <p class="profilepanelname">Your Name</p>
           <div class="accountPage">
             <h1>Your Name</h1>
             <p>Profile Description</p>
@@ -98,13 +100,14 @@
         </div>
         <div class="account" id="account">
           <img src="images/account(1).jpeg" alt="p" class="profilepic" />
-          <h4>Their Name</h4>
+          <p class="profilepanelname">Their Name</p>
           <div class="accountPage">
             <h1>Their Name</h1>
             <p>Profile Description</p>
             <button type="button" class="friendbutton" onclick="addFriend(2)">
               <b>ADD FRIEND</b>
             </button>
+            
           </div>
         </div>
       </div>
