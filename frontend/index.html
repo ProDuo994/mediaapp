@@ -26,9 +26,12 @@
     <button id="signupBtn">Sign Up</button>
   </body>
   <script>
-    document.getElementById('pswrd').addEventListener("keydown", (event) => {
+    document.getElementById("pswrd").addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
-        login(document.getElementById('usrname').value, document.getElementById('pswrd').value);
+        login(
+          document.getElementById("usrname").value,
+          document.getElementById("pswrd").value
+        );
       }
     });
   </script>

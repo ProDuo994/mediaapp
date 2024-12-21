@@ -1,4 +1,4 @@
-const server = "http://192.168.68.110:3000";
+const server = "http://192.168.68.108:3000";
 const accountName = "Admin";
 const D = new Date();
 let time = D.getTime();

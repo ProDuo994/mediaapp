@@ -51,19 +51,20 @@ app.post("/login", (req: any, res: any) => {
     };
     return res.status(200).send("[CHATMANAGER]: None account set");
   }
-  // TODO: Create token logic
-  if (account === undefined) {
-    return res.status(400).send("Could not find account");
-  }
-  if (username === "admin.admin" && password === "password") {
-    account.username = username;
-    account.displayName = username;
-    account.userID = 1;
-    res.status(200);
-    return;
-  } else {
-    console.log(username, password);
-    return;
+  let correctToken = checkTokenValid(token);
+  if (correctToken) {
+    if (account === undefined) {
+      return res.status(400).send("Could not find account");
+    }
+    if (username === "admin.admin" && password === "password") {
+      account.username = username;
+      account.displayName = username;
+      account.userID = 1;
+      res.status(200);
+      return;
+    } else {
+      return res.status(401).send("Incorrect Username/Password");
+    }
   }
 });
 
@@ -174,6 +175,7 @@ function createChat(chatName: string, chatDes: string, chatOwner: Account) {
       isPublic: false,
     };
     console.log(newChat);
+    return newChat;
   }
 }
 
@@ -203,12 +205,12 @@ app.post("/createChat", (req: any, res: any) => {
   if (!chatName || !chatDescription || !chatOwner) {
     return res.status(400).send("Chat name or chat description not provided.");
   } else {
-    createChat(
+    let chat = createChat(
       chatName as string,
       chatDescription as string,
       chatOwner as unknown as Account
     );
-    return res.status(200).send("Creating Chat");
+    return res.status(200).send(chat);
   }
 });
 app.get("/getChatID", (req: any, res: any) => {
@@ -231,13 +233,15 @@ app.get("/server", (req: any, res: any) => {
 });
 
 function addNewAccountToDatabase(databaseName: string, newAccount: Account) {
-  const database: string = "todo";
+  if (databaseName == null) {
+  }
+  const database = readDatabase(databaseName);
   if (database === null) {
     console.error("No Existing Data");
     return;
   }
-  //database.accounts.push(newAccount);
-  //writeDatabase(database, databaseName);
+  database.accounts.push(newAccount);
+  writeDatabase(database, databaseName);
 }
 
 function findAccountInDatabase(username: string, databaseName: string) {
@@ -269,10 +273,10 @@ function newMessageInDatabase(database: Database, newMessage: Message) {
 app.get("/getChatMessages", (req: any, res: any) => {
   let serverID = req.query["serverID"];
   if (serverID == undefined) {
-    return res.status(400);
+    return res.status(400).send("Must provide server ID");
   }
   const chatMessages = readDatabase("database/servers.json");
-  res.send(chatMessages);
+  res.status(200).send(chatMessages);
 });
 
 function deleteChat(chatID: number) {

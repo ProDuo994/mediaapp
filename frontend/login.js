@@ -1,4 +1,4 @@
-const server = "http://192.168.68.110:3000";
+const server = "http://192.168.68.108:3000";
 
 function processLogin() {
   window.location.href = "chat.html";
@@ -9,7 +9,9 @@ function login(username, password) {
     `${server}/login?${new URLSearchParams({
       username,
       password,
-      token: "a", })}`, {
+      token: "a",
+    })}`,
+    {
       method: "POST", // HTTP protocal being used
       headers: {
         "Content-Type": "application/json",
@@ -22,7 +24,6 @@ function login(username, password) {
     }
   )
     .then((res) => {
-      console.log(res.ok);
       if (res.ok) {
         processLogin();
       } else {
