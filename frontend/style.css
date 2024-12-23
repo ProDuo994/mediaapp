@@ -224,6 +224,11 @@ body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
+.friendbutton:hover {
+  cursor: pointer;
+  background-color: aqua;
+}
+
 .profilepanelname {
   text-align: center;
 }
@@ -251,6 +256,12 @@ body {
 
 .newChannelDialog {
   background-color: aqua;
+}
+
+dialog {
+  border: none;
+  border-radius: 8px;
+  padding: 20px;
 }
 
 @media screen and (max-width: 600px) {

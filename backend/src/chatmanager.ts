@@ -1,7 +1,8 @@
 import express from "express";
 import cors from "cors";
 import fs from "fs";
-import { Group, Account, Message, Database } from "./types/types";
+import bcrypt from "bcrypt";
+import { Group, Account, Message, Database, Member } from "./types/types";
 const app = express();
 app.use(express.json());
 app.use(
@@ -25,8 +26,15 @@ function findInDatabase(database: string, item: string) {
     item.startsWith("c") ||
     item.startsWith("d")
   ) {
-    return account;
+    for (let i = 0; i < item.length; i++)
+      do {
+        account = database.at(i);
+        if (account == item) {
+          return account;
+        }
+      } while (i < item.length);
   } else {
+    console.error("Could not find account in database");
   }
 }
 
@@ -46,8 +54,8 @@ app.post("/login", (req: any, res: any) => {
   if (account === undefined) {
     account = {
       username: "none",
-      displayName: "none",
-      userID: 0,
+      password: "none",
+      UserID: 0,
     };
     return res.status(200).send("[CHATMANAGER]: None account set");
   }
@@ -58,8 +66,8 @@ app.post("/login", (req: any, res: any) => {
     }
     if (username === "admin.admin" && password === "password") {
       account.username = username;
-      account.displayName = username;
-      account.userID = 1;
+      account.password = password;
+      account.UserID = 1;
       res.status(200);
       return;
     } else {
@@ -98,7 +106,7 @@ function sendMessageToGroup(message: Message) {}
 app.post("/sendmsg", (req: any, res: any) => {
   let sender: string = req.body.sender;
   let message: string = req.body.message;
-  let account = findAccountInDatabase(sender, "database/users");
+  let account = findMemberInDatabase(sender, "database/users");
   if (account && account.displayName === undefined) {
     account.displayName = account.username;
   }
@@ -145,7 +153,7 @@ function readDatabase(name: string): Database | null {
   }
 }
 
-function usernameToMember(username: string): Account | null {
+function usernameToMember(username: string): Member | null {
   let database = readDatabase("database/users.json");
   if (!database) {
     console.error("Database not found");
@@ -154,7 +162,7 @@ function usernameToMember(username: string): Account | null {
   let usernameInDatabase = database.accounts.find(
     (account) => account.username === username
   );
-  const member: Account = {
+  const member: Member = {
     username: "Name",
     displayName: "name",
     userID: 1,
@@ -162,10 +170,15 @@ function usernameToMember(username: string): Account | null {
   return member;
 }
 
-function createChat(chatName: string, chatDes: string, chatOwner: Account) {
+function createChat(
+  chatName: string,
+  chatDes: string,
+  chatOwner: Account
+): Group | null {
   let exists = activeChats.find(chatName.toString);
   if (exists) {
     console.log("Name allready exists");
+    return null;
   } else {
     const newChat: Group = {
       groupName: chatName,
@@ -179,22 +192,21 @@ function createChat(chatName: string, chatDes: string, chatOwner: Account) {
   }
 }
 
-function getServerMemberUsernames(serverID: number) {
+function getServerMemberUsernames(serverID: number): string {
   let database = readDatabase("database/servers.json");
-  let members: string[] = [];
-  return members;
+
+  let members = {
+    Ben: "Ben",
+  };
+  return members.Ben;
 }
 
-function getServerData(serverID: number) {
+function getServerData(serverID: number): string | null {
   if (!serverID) {
     console.error("Must provide serverID");
     return null;
   }
-  let data = {
-    serverName: "",
-    serverMembers: [""],
-  };
-  data.serverMembers = getServerMemberUsernames(serverID);
+  let data = getServerMemberUsernames(serverID);
   return data;
 }
 
@@ -225,11 +237,10 @@ app.get("/getChannelMessageServer", (req: any, res: any) => {
 app.get("/server", (req: any, res: any) => {
   let serverID = req.query.serverID;
   if (!serverID) {
-    res.status(400);
-    return;
+    return res.status(400).send("Must provide serverID");
   }
   const data = getServerData(serverID);
-  return res.status(200);
+  return res.status(200).send(data);
 });
 
 function addNewAccountToDatabase(databaseName: string, newAccount: Account) {
@@ -244,7 +255,7 @@ function addNewAccountToDatabase(databaseName: string, newAccount: Account) {
   writeDatabase(database, databaseName);
 }
 
-function findAccountInDatabase(username: string, databaseName: string) {
+function findMemberInDatabase(username: string, databaseName: string) : undefined | Member {
   if (!username) {
     console.error("Username not provided");
     return undefined;

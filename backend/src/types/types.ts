@@ -6,7 +6,7 @@ export interface Group {
   isPublic: boolean;
 }
 
-export interface Account {
+export interface Member {
   username: string;
   displayName: string;
   userID: number;
@@ -18,7 +18,7 @@ export interface Message {
   timesent: number;
 }
 
-export interface User {
+export interface Account {
   username: string;
   password: string;
   UserID: number;
