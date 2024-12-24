@@ -1,4 +1,5 @@
-const server = "http://192.168.68.108:3000";
+const server = "http://192.168.68.115:3000";
+const loginButton = document.getElementById("loginBtn");
 
 function processLogin() {
   window.location.href = "chat.html";
@@ -32,6 +33,13 @@ function login(username, password) {
     }) // waits for response then prints to log
     .catch((err) => console.error(err));
 }
+
+loginButton.addEventListener("click", (event) => {
+  login(
+    document.getElementById("usrname").value,
+    document.getElementById("pswrd").value
+  );
+});
 
 function enryptPassword(password) {
   if (password != null) {

@@ -50,7 +50,7 @@ app.post("/login", (req: any, res: any) => {
   let password = req.query["password"];
   let token = req.query["token"];
   console.log(username + password);
-  let account = findAccountInDatabase(username, "database/users.json");
+  let account: Account = findInDatabase(username, "database/users.json");
   if (account === undefined) {
     account = {
       username: "none",
@@ -68,8 +68,7 @@ app.post("/login", (req: any, res: any) => {
       account.username = username;
       account.password = password;
       account.UserID = 1;
-      res.status(200);
-      return;
+      return res.status(200).send(account);
     } else {
       return res.status(401).send("Incorrect Username/Password");
     }
@@ -230,8 +229,12 @@ app.get("/getChatID", (req: any, res: any) => {
   return res.status(200).send(chatID);
 });
 app.get("/getChannelMessageServer", (req: any, res: any) => {
-  const chatMessages = readDatabase("database/servers.json");
-  return res.status(200).send(chatMessages);
+  const database = readDatabase("database/servers.json");
+  let messages = database?.messages;
+  if (messages) {
+    return res.status(200).send(messages);
+  }
+  return res.status(401).send("Could not find messages");
 });
 
 app.get("/server", (req: any, res: any) => {
@@ -255,7 +258,10 @@ function addNewAccountToDatabase(databaseName: string, newAccount: Account) {
   writeDatabase(database, databaseName);
 }
 
-function findMemberInDatabase(username: string, databaseName: string) : undefined | Member {
+function findMemberInDatabase(
+  username: string,
+  databaseName: string
+): undefined | Member {
   if (!username) {
     console.error("Username not provided");
     return undefined;
@@ -279,6 +285,7 @@ function newMessageInDatabase(database: Database, newMessage: Message) {
     return;
   }
   database.messages.push(newMessage);
+  return database.messages;
 }
 
 app.get("/getChatMessages", (req: any, res: any) => {
@@ -287,7 +294,8 @@ app.get("/getChatMessages", (req: any, res: any) => {
     return res.status(400).send("Must provide server ID");
   }
   const chatMessages = readDatabase("database/servers.json");
-  res.status(200).send(chatMessages);
+  let messages = chatMessages?.messages;
+  res.status(200).send(messages);
 });
 
 function deleteChat(chatID: number) {
@@ -300,9 +308,9 @@ function getChatMembers(chatID: number) {
 }
 
 function openChannel(num: number) {
-  if (num == 1) {
+  if (num === 1) {
     console.log(num);
-  } else if (num == 2) {
+  } else if (num === 2) {
     console.log(num);
   }
 }

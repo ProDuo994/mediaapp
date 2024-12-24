@@ -15,17 +15,19 @@
     </noscript>
     <h1>MEDIAPP</h1>
     <br />
-    <h2 class="loginTitle">Login</h2>
-    <input type="text" name="Username" id="usrname" class="usrname" />
-    <input type="password" name="Password" id="pswrd" class="pswrd" />
-    <button
-      id="loginBtn"
-      class="loginBtn"
-      onclick="login(document.getElementById('usrname').value, document.getElementById('pswrd').value)"
-    >
-      Login
-    </button>
-    <button id="signupBtn">Sign Up</button>
+    <form>
+      <h2 class="loginTitle">Login</h2>
+      <input type="text" name="Username" id="usrname" class="usrname" />
+      <input type="password" name="Password" id="pswrd" class="pswrd" />
+      <button
+        id="loginBtn"
+        class="loginBtn"
+        onclick="login(document.getElementById('usrname').value, document.getElementById('pswrd').value)"
+      >
+        Login
+      </button>
+      <button id="signupBtn">Sign Up</button>
+    </form>
   </body>
   <script>
     document.getElementById("pswrd").addEventListener("keydown", (event) => {
