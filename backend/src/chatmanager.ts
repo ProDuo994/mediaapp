@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import fs from "fs";
+import fs, { accessSync } from "fs";
 import bcrypt from "bcrypt";
 import { Group, Account, Message, Database, Member } from "./types/types";
 const app = express();
@@ -14,9 +14,10 @@ app.use(
 const port = 3000;
 let activeChats: string[] = [];
 
-function findInDatabase(database: string, item: string) {
+function findInDatabase(database: string, item: string): Account | undefined {
   if (!database || !item) {
-    return console.error("Args not provided");
+    console.error("Args not provided");
+    return undefined;
   }
   let account;
   // TODO: Implement sorting algorithim
@@ -28,13 +29,19 @@ function findInDatabase(database: string, item: string) {
   ) {
     for (let i = 0; i < item.length; i++)
       do {
-        account = database.at(i);
-        if (account == item) {
+        let account: Account = {
+          username: "",
+          password: "",
+          userID: 1,
+        };
+        if (account.username == item) {
           return account;
         }
       } while (i < item.length);
+    return undefined;
   } else {
     console.error("Could not find account in database");
+    return undefined;
   }
 }
 
@@ -50,12 +57,15 @@ app.post("/login", (req: any, res: any) => {
   let password = req.query["password"];
   let token = req.query["token"];
   console.log(username + password);
-  let account: Account = findInDatabase(username, "database/users.json");
+  let account: Account | undefined = findInDatabase(
+    username,
+    "database/users.json"
+  );
   if (account === undefined) {
     account = {
       username: "none",
       password: "none",
-      UserID: 0,
+      userID: 0,
     };
     return res.status(200).send("[CHATMANAGER]: None account set");
   }
@@ -67,7 +77,7 @@ app.post("/login", (req: any, res: any) => {
     if (username === "admin.admin" && password === "password") {
       account.username = username;
       account.password = password;
-      account.UserID = 1;
+      account.userID = 1;
       return res.status(200).send(account);
     } else {
       return res.status(401).send("Incorrect Username/Password");
@@ -275,8 +285,19 @@ function findMemberInDatabase(
     return undefined;
   }
   const accountList: Account[] = database.accounts;
-  let account = accountList.find((elem) => elem.username === username);
-  return account;
+  const account: Account | undefined = database.accounts.find(
+    (account: Account) => {
+      return account.username == username ? account : undefined;
+    }
+  );
+  let member: Member | undefined = account
+    ? {
+        username,
+        displayName: username,
+        userID: account.userID,
+      }
+    : undefined;
+  return member;
 }
 
 function newMessageInDatabase(database: Database, newMessage: Message) {

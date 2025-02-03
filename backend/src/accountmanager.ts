@@ -64,7 +64,7 @@ function createAccount(username: string, password: string) {
   const newUser: User = {
     username,
     password,
-    UserID: userId,
+    userID: userId,
   };
   writeDatabase(newUser.username, "database/users.json");
 }

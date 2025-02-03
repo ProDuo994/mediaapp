@@ -1,5 +1,4 @@
-const server = "http://192.168.68.115:3000";
-const loginButton = document.getElementById("loginBtn");
+const server = "http://192.168.0.1:3000";
 
 function processLogin() {
   window.location.href = "chat.html";
@@ -13,7 +12,7 @@ function login(username, password) {
       token: "a",
     })}`,
     {
-      method: "POST", // HTTP protocal being used
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         "X-Content-Type-Options": "nosniff",
@@ -34,12 +33,15 @@ function login(username, password) {
     .catch((err) => console.error(err));
 }
 
-loginButton.addEventListener("click", (event) => {
-  login(
-    document.getElementById("usrname").value,
-    document.getElementById("pswrd").value
-  );
-});
+window.onload = () => {
+  const loginButton = document.getElementById("loginBtn");
+  loginButton.addEventListener("click", (event) => {
+    login(
+      document.getElementById("usrname").value,
+      document.getElementById("pswrd").value
+    );
+  });
+};
 
 function enryptPassword(password) {
   if (password != null) {
