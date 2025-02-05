@@ -1,6 +1,7 @@
-const server = "http://192.168.0.1:3000";
+const server = "http://192.168.68.107:3000";
 
 function processLogin() {
+  console.log("good");
   window.location.href = "chat.html";
 }
 
