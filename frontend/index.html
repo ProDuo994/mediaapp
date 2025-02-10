@@ -5,7 +5,7 @@
     <title>Login | MEDIAPP</title>
     <!-- <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" /> -->
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script type="text/javascript" src="../frontend/login.js"></script>
+    <script type="text/javascript" src="login.js"></script>
     <link rel="stylesheet" href="style.css" />
   </head>
 
@@ -15,22 +15,12 @@
     </noscript>
     <h1>MEDIAPP</h1>
     <br />
-    <form>
+    <form id="loginForm">
       <h2 class="loginTitle">Login</h2>
       <input type="text" name="Username" id="usrname" class="usrname" />
       <input type="password" name="Password" id="pswrd" class="pswrd" />
-      <button id="loginBtn" class="loginBtn">Login</button>
+      <input type="submit" id="loginBtn" class="loginBtn" value="Login" />
       <button id="signupBtn">Sign Up</button>
     </form>
   </body>
-  <script>
-    document.getElementById("pswrd").addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        login(
-          document.getElementById("usrname").value,
-          document.getElementById("pswrd").value
-        );
-      }
-    });
-  </script>
 </html>

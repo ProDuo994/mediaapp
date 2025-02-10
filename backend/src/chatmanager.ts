@@ -14,35 +14,24 @@ app.use(
 const port = 3000;
 let activeChats: string[] = [];
 
-function findInDatabase(database: string, item: string): Account | undefined {
+function findAccountsInDatabase(
+  database: string,
+  item: string
+): Account | undefined {
   if (!database || !item) {
     console.error("Args not provided");
     return undefined;
   }
-  let account;
-  // TODO: Implement sorting algorithim
-  if (
-    item.startsWith("a") ||
-    item.startsWith("b") ||
-    item.startsWith("c") ||
-    item.startsWith("d")
-  ) {
-    for (let i = 0; i < item.length; i++)
-      do {
-        let account: Account = {
-          username: "",
-          password: "",
-          userID: 1,
-        };
-        if (account.username == item) {
-          return account;
-        }
-      } while (i < item.length);
-    return undefined;
-  } else {
-    console.error("Could not find account in database");
+  const itemInDatabase: Database | null = readDatabase(database);
+
+  console.log(itemInDatabase);
+
+  if (itemInDatabase === null) {
+    console.error("blah");
     return undefined;
   }
+
+  return itemInDatabase.accounts.find((account) => account.username == item);
 }
 
 function checkTokenValid(token: string) {
@@ -56,11 +45,12 @@ app.post("/login", (req: any, res: any) => {
   let username = req.query["username"];
   let password = req.query["password"];
   let token = req.query["token"];
-  console.log(username + password);
-  let account: Account | undefined = findInDatabase(
-    username,
-    "database/users.json"
+  console.log(username + "/" + password);
+  let account: Account | undefined = findAccountsInDatabase(
+    "database/users.json",
+    username
   );
+  // Here
   if (account === undefined) {
     account = {
       username: "none",

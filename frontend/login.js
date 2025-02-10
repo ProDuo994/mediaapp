@@ -1,10 +1,12 @@
-const server = "http://192.168.0.1:3000";
+const server = "http://192.168.2.55:3000";
 
 function processLogin() {
+  console.log("hello from processLogin");
   window.location.href = "chat.html";
 }
 
 function login(username, password) {
+  console.log(`Running login: fetching ${server}/login`);
   fetch(
     `${server}/login?${new URLSearchParams({
       username,
@@ -24,6 +26,7 @@ function login(username, password) {
     }
   )
     .then((res) => {
+      console.log("received response");
       if (res.ok) {
         processLogin();
       } else {
@@ -34,8 +37,9 @@ function login(username, password) {
 }
 
 window.onload = () => {
-  const loginButton = document.getElementById("loginBtn");
-  loginButton.addEventListener("click", (event) => {
+  const loginForm = document.getElementById("loginForm");
+  loginForm.addEventListener("submit", (event) => {
+    event.preventDefault();
     login(
       document.getElementById("usrname").value,
       document.getElementById("pswrd").value
