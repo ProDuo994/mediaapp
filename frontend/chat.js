@@ -1,12 +1,15 @@
-const server = "192.168.2.55:3000";
+const server = "192.168.68.107:3000";
 const accountName = "Admin";
-const D = new Date();
-let time = D.getTime();
-let lastAmountOfMessages = -1;
+let lastAmountOfMessages = getLastMesssagesLength();
 const currentChatMessages = document.getElementById("channelMessages").children;
 const chatMessagesFromServer = "";
 let ServerName = "server";
 let messageHistory = [];
+
+function getLastMesssagesLength() {
+  const amount = messageHistory.length;
+  return amount;
+}
 
 function getServer(serverID) {
   fetch(
@@ -22,7 +25,7 @@ function getServer(serverID) {
   });
 }
 
-function sendMessage(sender, message) {
+function sendMessage(sender, message, isGroup) {
   return new Promise((resolve, reject) => {
     if (sender === undefined || message === undefined) {
       reject("Must provide all arguments");
@@ -32,6 +35,7 @@ function sendMessage(sender, message) {
       `${server}/sendmsg?${new URLSearchParams({
         sender: sender,
         message: message,
+        type: isGroup,
       }).toString()}`,
       {
         method: "POST",
@@ -138,6 +142,7 @@ function getChannelMessageServer(name) {
 function getMessagesFromClient() {
   let messages = {
     Admin: "Hello",
+    Admin: "Hi",
   };
   return messages;
 }
@@ -258,7 +263,7 @@ messageBoxInput.addEventListener("keydown", (event) => {
     messageBoxInput.value = "";
     createAndAppend("h4", messageViewBox, accountName + ": " + message);
     messageHistory.push(message);
-    sendMessage(accountName, message, time);
+    sendMessage(accountName, message, false);
   }
 });
 
@@ -270,6 +275,7 @@ function saveServerData(serverID) {
   let database = "../backend/database.json";
   let currentMessages = getMessagesFromClient();
   database.messages = currentMessages;
+  // Show all active users those messages
 }
 
 function addFriend(userID) {

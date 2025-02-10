@@ -45,10 +45,16 @@ app.post("/login", (req: any, res: any) => {
   let username = req.query["username"];
   let password = req.query["password"];
   let token = req.query["token"];
+<<<<<<< HEAD
   console.log(username + "/" + password);
   let account: Account | undefined = findAccountsInDatabase(
     "database/users.json",
     username
+=======
+  let account: Account | undefined = findInDatabase(
+    username,
+    "database/users.json"
+>>>>>>> f7f68ddc5b1f4bda38cff323a4bebf2a39147862
   );
   // Here
   if (account === undefined) {
@@ -100,11 +106,21 @@ function writeDatabase(data: object, name: string) {
   }
 }
 
-function sendMessageToGroup(message: Message) {}
+function getOwnerOfGroup(groupName: string) {
+  const owner: Member = {
+    username: "",
+    displayName: "",
+    userID: 0,
+  };
+  return owner;
+}
+
+function sendMessageToGroup(message: Message, group: Group) {}
 
 app.post("/sendmsg", (req: any, res: any) => {
   let sender: string = req.body.sender;
   let message: string = req.body.message;
+  let type: string = req.body.type;
   let account = findMemberInDatabase(sender, "database/users");
   if (account && account.displayName === undefined) {
     account.displayName = account.username;
@@ -112,13 +128,24 @@ app.post("/sendmsg", (req: any, res: any) => {
   if (sender !== undefined && message !== undefined && account) {
     let fullMessage = formatMessage(account.displayName, message, 0);
     console.log("[CHATMANAGER/MESSAGE]: " + fullMessage);
-    sendMessageToGroup(fullMessage);
-    let database = readDatabase("database/servers.json");
-    if (!database) {
-      return res.status(400);
+    if (type == "group") {
+      const testGroup: Group = {
+        groupName: "",
+        groupDescription: "",
+        members: [],
+        owner: undefined,
+        isPublic: false,
+      };
+      testGroup.owner = getOwnerOfGroup(testGroup.groupName)
+      sendMessageToGroup(fullMessage, testGroup);
+    } else {
+      let database = readDatabase("database/servers.json");
+      if (!database) {
+        return res.status(400);
+      }
+      newMessageInDatabase(database, fullMessage);
+      return res.status(200).json(fullMessage);
     }
-    newMessageInDatabase(database, fullMessage);
-    return res.status(200).json(fullMessage);
   } else {
     return res.status(400).send("All args not provided");
   }
@@ -131,6 +158,12 @@ function updateSettings(
   canMessage: boolean
 ) {
   let database = readDatabase("database/servers.json");
+  if (database == null) {
+    console.error("Could not find database");
+    return false;
+  }
+  database.["SERVER 1"]["Channel 1"].Settings.serverName = serverName;
+  return true;
 }
 
 app.post("/updateSettings", (req: any, res: any) => {
@@ -196,6 +229,7 @@ function getServerMemberUsernames(serverID: number): string {
 
   let members = {
     Ben: "Ben",
+    Admin: "Admin",
   };
   return members.Ben;
 }

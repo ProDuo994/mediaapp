@@ -1,4 +1,7 @@
 export interface Group {
+  [x: string]: Member;
+  testGroup: Member;
+  testGroup: Member;
   groupName: string;
   groupDescription: string;
   members: Account[];
