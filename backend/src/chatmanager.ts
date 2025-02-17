@@ -42,21 +42,14 @@ function checkTokenValid(token: string) {
 }
 
 app.post("/login", (req: any, res: any) => {
-  let username = req.query["username"];
-  let password = req.query["password"];
-  let token = req.query["token"];
-<<<<<<< HEAD
+  let username = req.query.username;
+  let password = req.query.password;
+  let token = req.query.token;
   console.log(username + "/" + password);
   let account: Account | undefined = findAccountsInDatabase(
     "database/users.json",
     username
-=======
-  let account: Account | undefined = findInDatabase(
-    username,
-    "database/users.json"
->>>>>>> f7f68ddc5b1f4bda38cff323a4bebf2a39147862
   );
-  // Here
   if (account === undefined) {
     account = {
       username: "none",
@@ -93,22 +86,23 @@ function formatMessage(
   };
 }
 
-function writeDatabase(data: object, name: string) {
+async function writeDatabase(data: object, name: string) {
   if (!data) return console.log("No Data found");
   try {
     const existing: any = readDatabase(name);
-    fs.writeFileSync(`${name}_bak.json`, existing);
-    fs.writeFileSync(name, JSON.stringify(data));
+    fs.promises.writeFile(`${name}_bak.json`, existing);
+    fs.promises.writeFile(name, JSON.stringify(data));
     console.log("Data saved");
   } catch {
     console.error("Failed to write to database");
-    return null;
+    return Error;
   }
 }
 
 function getOwnerOfGroup(groupName: string) {
   const owner: Member = {
     username: "",
+    password: "",
     displayName: "",
     userID: 0,
   };
@@ -136,10 +130,10 @@ app.post("/sendmsg", (req: any, res: any) => {
         owner: undefined,
         isPublic: false,
       };
-      testGroup.owner = getOwnerOfGroup(testGroup.groupName)
-      sendMessageToGroup(fullMessage, testGroup);
+      testGroup.owner = getOwnerOfGroup(testGroup.groupName);
+      sendMessageToGroup(fuldlMessage, testGroup);
     } else {
-      let database = readDatabase("database/servers.json");
+      let database = await readDatabase("database/servers.json");
       if (!database) {
         return res.status(400);
       }
@@ -162,7 +156,7 @@ function updateSettings(
     console.error("Could not find database");
     return false;
   }
-  database.["SERVER 1"]["Channel 1"].Settings.serverName = serverName;
+  database["SERVER 1"]["Channel 1"].Settings.serverName = serverName;
   return true;
 }
 
@@ -175,9 +169,9 @@ app.post("/updateSettings", (req: any, res: any) => {
   res.status(200);
 });
 
-function readDatabase(name: string): Database | null {
+async function readDatabase(name: string): Promise<Database | null> {
   try {
-    const data = fs.readFileSync(name, "utf8");
+    const data = await fs.promises.readFile(name, "utf8");
     return JSON.parse(data);
   } catch {
     console.error("Could not read database");
@@ -317,6 +311,7 @@ function findMemberInDatabase(
   let member: Member | undefined = account
     ? {
         username,
+        password = account.password,
         displayName: username,
         userID: account.userID,
       }
@@ -339,7 +334,10 @@ app.get("/getChatMessages", (req: any, res: any) => {
     return res.status(400).send("Must provide server ID");
   }
   const chatMessages = readDatabase("database/servers.json");
-  let messages = chatMessages?.messages;
+  if (chatMessages == undefined) {
+    return res.status(401).send("Could not find messages");
+  }
+  let messages = chatMessages.messages;
   res.status(200).send(messages);
 });
 

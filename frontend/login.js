@@ -1,4 +1,7 @@
 const server = "http://192.168.2.55:3000";
+const envPass = process.env.PASSWORD;
+const envToken = process.env.TOKEN;
+const loginButton = document.getElementById("loginBtn");
 
 function processLogin() {
   console.log("hello from processLogin");
@@ -7,11 +10,12 @@ function processLogin() {
 
 function login(username, password) {
   console.log(`Running login: fetching ${server}/login`);
+  loginButton.disabled = true;
   fetch(
     `${server}/login?${new URLSearchParams({
       username,
       password,
-      token: "a",
+      token: envToken,
     })}`,
     {
       method: "POST",
@@ -31,6 +35,7 @@ function login(username, password) {
         processLogin();
       } else {
         window.alert("Username or Password incorrect!");
+        loginButton.disabled = false;
       }
     }) // waits for response then prints to log
     .catch((err) => console.error(err));
@@ -49,7 +54,7 @@ window.onload = () => {
 
 function enryptPassword(password) {
   if (password != null) {
-    password = "Encrypted" + password;
+    password = "$" + password + "$";
     return password;
   } else {
     console.warn("Password not provided");

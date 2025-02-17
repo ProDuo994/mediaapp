@@ -1,6 +1,6 @@
 import bcrypt, { hash } from "bcrypt";
 import fs from "fs";
-const accounts:string[] = [];
+const accounts: string[] = [];
 const loginButton = document.getElementById("loginBtn");
 const signupButton = document.getElementById("signupBtn");
 const username = document.getElementById("usrname");
@@ -66,7 +66,7 @@ function createAccount(username: any, password: any, arg2: number) {
   throw new Error("Function not implemented.");
 }
 
-function login(username:string, password:string) {
+function login(username: string, password: string) {
   let key = getEncryptionKey();
   const account = accounts.find(
     (acc) => acc.username === username && acc.password === password
@@ -101,7 +101,7 @@ function signup(username, password) {
 }
 
 if (signupButton !== null) {
-signupButton.addEventListener("click", (event) => {
-  signup("testusername", "testpass");
-});}
-
+  signupButton.addEventListener("click", (event) => {
+    signup("testusername", "testpass");
+  });
+}

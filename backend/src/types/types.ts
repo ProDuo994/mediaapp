@@ -1,6 +1,4 @@
 export interface Group {
-  [x: string]: Member;
-  testGroup: Member;
   testGroup: Member;
   groupName: string;
   groupDescription: string;
@@ -11,6 +9,7 @@ export interface Group {
 
 export interface Member {
   username: string;
+  password: string;
   displayName: string;
   userID: number;
 }
