@@ -14,15 +14,15 @@ app.use(
 const port = 3000;
 let activeChats: string[] = [];
 
-function findAccountsInDatabase(
+async function findAccountsInDatabase(
   database: string,
   item: string
-): Account | undefined {
+): Promise<Account | undefined> {
   if (!database || !item) {
     console.error("Args not provided");
     return undefined;
   }
-  const itemInDatabase: Database | null = readDatabase(database);
+  const itemInDatabase: Database | null = await readDatabase(database);
 
   console.log(itemInDatabase);
 
@@ -41,12 +41,12 @@ function checkTokenValid(token: string) {
   return false;
 }
 
-app.post("/login", (req: any, res: any) => {
+app.post("/login", async (req: any, res: any) => {
   let username = req.query.username;
   let password = req.query.password;
   let token = req.query.token;
   console.log(username + "/" + password);
-  let account: Account | undefined = findAccountsInDatabase(
+  let account: Account | undefined = await findAccountsInDatabase(
     "database/users.json",
     username
   );
@@ -111,7 +111,7 @@ function getOwnerOfGroup(groupName: string) {
 
 function sendMessageToGroup(message: Message, group: Group) {}
 
-app.post("/sendmsg", (req: any, res: any) => {
+app.post("/sendmsg", async (req: any, res: any) => {
   let sender: string = req.body.sender;
   let message: string = req.body.message;
   let type: string = req.body.type;
@@ -131,7 +131,7 @@ app.post("/sendmsg", (req: any, res: any) => {
         isPublic: false,
       };
       testGroup.owner = getOwnerOfGroup(testGroup.groupName);
-      sendMessageToGroup(fuldlMessage, testGroup);
+      sendMessageToGroup(fullMessage, testGroup);
     } else {
       let database = await readDatabase("database/servers.json");
       if (!database) {
@@ -145,19 +145,31 @@ app.post("/sendmsg", (req: any, res: any) => {
   }
 });
 
-function updateSettings(
-  serverName: string,
+async function updateSettings(
+  oldServerName: string,
   serverDes: string,
-  isVisible: boolean,
-  canMessage: boolean
+  isVisible: boolean
 ) {
-  let database = readDatabase("database/servers.json");
+  let database = await readDatabase("database/servers.json");
   if (database == null) {
     console.error("Could not find database");
     return false;
   }
-  database["SERVER 1"]["Channel 1"].Settings.serverName = serverName;
-  return true;
+  // database.groups is sorted
+  let groupToUpdate: Group | undefined = undefined;
+  let ptr = Math.round(database.groups.length / 2);
+  while (groupToUpdate != undefined) {
+    if (database.groups[ptr]?.groupName == oldServerName) {
+      let group = database.groups[ptr];
+      group.groupDescription = serverDes;
+      group.groupName = oldServerName;
+      group.isPublic = isVisible;
+      return;
+    } else {
+      console.log("Could not find group in database");
+      return null;
+    }
+  }
 }
 
 app.post("/updateSettings", (req: any, res: any) => {
@@ -186,12 +198,13 @@ function usernameToMember(username: string): Member | null {
     return null;
   }
   let usernameInDatabase = database.accounts.find(
-    (account) => account.username === username
+    (account: { username: string }) => account.username === username
   );
   const member: Member = {
     username: "Name",
     displayName: "name",
     userID: 1,
+    password: usernameInDatabase.password,
   };
   return member;
 }
@@ -311,7 +324,7 @@ function findMemberInDatabase(
   let member: Member | undefined = account
     ? {
         username,
-        password = account.password,
+        password: account.password,
         displayName: username,
         userID: account.userID,
       }

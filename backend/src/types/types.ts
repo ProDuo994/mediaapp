@@ -1,10 +1,10 @@
 export interface Group {
-  testGroup: Member;
   groupName: string;
   groupDescription: string;
   members: Account[];
-  owner: Account;
+  owner: Account | undefined;
   isPublic: boolean;
+  id: number;
 }
 
 export interface Member {
@@ -36,4 +36,5 @@ export interface Permissions {
 export interface Database {
   accounts: Account[];
   messages: Message[];
+  groups: Group[];
 }
