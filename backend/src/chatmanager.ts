@@ -165,9 +165,10 @@ async function updateSettings(
       group.groupName = oldServerName;
       group.isPublic = isVisible;
       return;
+    } else if (database.groups[ptr]?.id < ptr) {
+      ptr = Math.round(database.groups.length / 4);
     } else {
-      console.log("Could not find group in database");
-      return null;
+      ptr = Math.round(database.groups.length * 2);
     }
   }
 }
