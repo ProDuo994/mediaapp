@@ -1,5 +1,5 @@
 {
-  "Members": {
+  "accounts": [
     "ADMIN": {
       "username": "admin.admin",
       "password": "password",
@@ -10,5 +10,5 @@
       "password": "password",
       "userid": 2
     }
-  }
+  ]
 }

@@ -1,7 +1,5 @@
 const server = "http://192.168.2.55:3000";
-const envPass = process.env.PASSWORD;
-const envToken = process.env.TOKEN;
-const loginButton = document.getElementById("loginBtn");
+let loginButton;
 
 function processLogin() {
   console.log("hello from processLogin");
@@ -15,7 +13,6 @@ function login(username, password) {
     `${server}/login?${new URLSearchParams({
       username,
       password,
-      token: envToken,
     })}`,
     {
       method: "POST",
@@ -43,6 +40,8 @@ function login(username, password) {
 
 window.onload = () => {
   const loginForm = document.getElementById("loginForm");
+  loginButton = document.getElementById("loginBtn");
+
   loginForm.addEventListener("submit", (event) => {
     event.preventDefault();
     login(
