@@ -3,7 +3,6 @@ import cors from "cors";
 import fs, { accessSync } from "fs";
 import bcrypt from "bcrypt";
 import { Group, Account, Message, Database, Member } from "./types/types";
-import { isNull } from "util";
 const app = express();
 app.use(express.json());
 app.use(
@@ -32,9 +31,9 @@ function binarySearch<Sortable>(
 
 async function findAccountInDatabase(
   databaseName: string,
-  item: string
+  username: string
 ): Promise<Account | undefined> {
-  if (!databaseName || !item) {
+  if (!databaseName || !username) {
     console.error("Args not provided");
     return undefined;
   }
@@ -44,8 +43,8 @@ async function findAccountInDatabase(
     console.error("Could not find account");
     return undefined;
   }
-  console.log(database);
-  return database.accounts.find((account) => account.username == item);
+  console.log(database.accounts[username]);
+  return database.accounts[username];
 }
 
 app.post("/login", async (req: any, res: any) => {
@@ -155,7 +154,6 @@ async function updateSettings(
     console.error("Could not find database");
     return false;
   }
-  // database.groups is sorted
   let groupToUpdate: Group | undefined = undefined;
   return groupToUpdate;
 }
@@ -185,9 +183,7 @@ async function usernameToMember(username: string): Promise<Member | null> {
     console.error("Database not found");
     return null;
   }
-  let usernameInDatabase = database.accounts.find(
-    (account: { username: string }) => account.username === username
-  );
+  let usernameInDatabase = database.accounts[username];
   if (usernameInDatabase == undefined) {
     return null;
   }
@@ -306,11 +302,7 @@ async function findMemberInDatabase(
     return undefined;
   }
   const accountList: Account[] = database.accounts;
-  const account: Account | undefined = database.accounts.find(
-    (account: Account) => {
-      return account.username == username ? account : undefined;
-    }
-  );
+  const account: Account | undefined = database.accounts[username];
   let member: Member | undefined = account
     ? {
         username,
@@ -336,11 +328,15 @@ app.get("/getChatMessages", async (req: any, res: any) => {
   if (serverID == undefined) {
     return res.status(400).send("Must provide server ID");
   }
-  const chatMessages = await readDatabase("database/servers.json");
-  if (chatMessages == undefined) {
-    return res.status(401).send("Could not find messages");
+  const database = await readDatabase("database/servers.json");
+  if (!database) {
+    return res.status(500);
   }
-  let messages = chatMessages.messages;
+  console.log(database);
+  if (database.messages == undefined) {
+    return res.status(404).send("Could not find messages");
+  }
+  let messages = database.messages;
   res.status(200).send(messages);
 });
 

@@ -34,7 +34,7 @@ export interface Permissions {
 }
 
 export interface Database {
-  accounts: Account[];
+  accounts: Record<string, Account>;
   messages: Message[];
   groups: Group[];
 }

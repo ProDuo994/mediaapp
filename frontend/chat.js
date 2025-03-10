@@ -1,10 +1,11 @@
-const server = "192.168.68.107:3000";
+const server = "http://192.168.2.55:3000";
 const accountName = "Admin";
-let lastAmountOfMessages = getLastMesssagesLength();
-const currentChatMessages = document.getElementById("channelMessages").children;
+
+let currentChatMessages;
 const chatMessagesFromServer = "";
 let ServerName = "server";
 let messageHistory = [];
+let lastAmountOfMessages = getLastMesssagesLength();
 
 function getLastMesssagesLength() {
   const amount = messageHistory.length;
@@ -100,7 +101,7 @@ function getMessageFromServer(serverID) {
     fetch(
       `${server}/getChatMessages?${new URLSearchParams({
         serverID: serverID,
-      }).toString()}`,
+      })}`,
       {
         method: "GET",
         headers: {
@@ -110,6 +111,11 @@ function getMessageFromServer(serverID) {
       }
     )
       .then((res) => {
+        console.log(
+          `${server}/getChatMessages?${new URLSearchParams({
+            serverID: serverID,
+          })}`
+        );
         res
           .json()
           .then((json) => resolve(json))
@@ -166,13 +172,18 @@ function updateSettingsEndpoint(serverName, serverDes, isVisible, canMessage) {
 function createChannel(chatName, channelName) {}
 
 function pollMessages(serverID) {
-  fetch(`${server}/getChannelMessageServer`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Content-Type-Options": "nosniff",
-    },
-  })
+  fetch(
+    `${server}/getChatMessages?${new URLSearchParams({
+      serverID: serverID,
+    })}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Content-Type-Options": "nosniff",
+      },
+    }
+  )
     .then((res) => {
       const server1 = res["SERVER 1"];
       const channel1Messages = server1["Channel 1"].messages;
@@ -275,12 +286,15 @@ function saveServerData(serverID) {
   let database = "../backend/database.json";
   let currentMessages = getMessagesFromClient();
   database.messages = currentMessages;
-  // Show all active users those messages
 }
 
 function addFriend(userID) {
   console.log("Friend Added With ID: " + userID);
 }
 
-loadServerData(getChatID(ServerName));
-const msgReceiveInteval = setInterval(pollMessages(0), 1000);
+window.onload = () => {
+  currentChatMessages = document.getElementById("channelMessages").children;
+
+  loadServerData(getChatID(ServerName));
+  const msgReceiveInteval = setInterval(pollMessages(0), 1000);
+};

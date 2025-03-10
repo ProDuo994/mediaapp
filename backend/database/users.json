@@ -1,14 +1,14 @@
 {
-  "accounts": [
-    "ADMIN": {
-      "username": "admin.admin",
+  "accounts": {
+    "admin.admin": {
+      "displayName": "Admin",
       "password": "password",
       "userid": 1
     },
-    "Ben S": {
-      "username": "benjamin.speechley",
+    "benjamin.speechley": {
+      "displayName": "Ben S",
       "password": "password",
       "userid": 2
     }
-  ]
+  }
 }
