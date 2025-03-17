@@ -1,6 +1,10 @@
 const server = "http://192.168.2.55:3000";
-const accountName = "Admin";
+const loggedInDisplayName = localStorage.getItem("displayName");
 
+if (!loggedInDisplayName) {
+  alert("You're not logged in!");
+  window.location.href = "index.html";
+}
 let currentChatMessages;
 const chatMessagesFromServer = "";
 let ServerName = "server";
@@ -272,7 +276,7 @@ messageBoxInput.addEventListener("keydown", (event) => {
   if (event.key === "Enter") {
     const message = messageBoxInput.value;
     messageBoxInput.value = "";
-    createAndAppend("h4", messageViewBox, accountName + ": " + message);
+    createAndAppend("h4", messageViewBox, loggedInDisplayName + ": " + message);
     messageHistory.push(message);
     sendMessage(accountName, message, false);
   }

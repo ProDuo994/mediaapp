@@ -56,20 +56,9 @@ app.post("/login", async (req: any, res: any) => {
     username
   );
   if (account === undefined) {
-    account = {
-      username: "none",
-      password: "none",
-      userID: 0,
-    };
-    return res.status(200).send("[CHATMANAGER]: None account set");
-  }
-  if (account === undefined) {
     return res.status(400).send("Could not find account");
   }
-  if (username === "admin.admin" && password === "password") {
-    account.username = username;
-    account.password = password;
-    account.userID = 1;
+  if (password === account.password) {
     return res.status(200).send(account);
   } else {
     return res.status(401).send("Incorrect Username/Password");
@@ -301,7 +290,6 @@ async function findMemberInDatabase(
   if (database == undefined || database.accounts === undefined) {
     return undefined;
   }
-  const accountList: Account[] = database.accounts;
   const account: Account | undefined = database.accounts[username];
   let member: Member | undefined = account
     ? {
@@ -332,7 +320,6 @@ app.get("/getChatMessages", async (req: any, res: any) => {
   if (!database) {
     return res.status(500);
   }
-  console.log(database);
   if (database.messages == undefined) {
     return res.status(404).send("Could not find messages");
   }

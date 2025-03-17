@@ -1,8 +1,8 @@
 const server = "http://192.168.2.55:3000";
 let loginButton;
 
-function processLogin() {
-  console.log("hello from processLogin");
+function processLogin(displayName) {
+  localStorage.setItem("displayName", displayName);
   window.location.href = "chat.html";
 }
 
@@ -29,7 +29,9 @@ function login(username, password) {
     .then((res) => {
       console.log("received response");
       if (res.ok) {
-        processLogin();
+        res.json().then((account) => {
+          processLogin(account.displayName);
+        });
       } else {
         window.alert("Username or Password incorrect!");
         loginButton.disabled = false;
