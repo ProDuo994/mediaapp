@@ -1,8 +1,7 @@
-const server = "http://192.168.2.55:3000";
+const server = "http://172.23.64.1:3000";
 const loggedInDisplayName = localStorage.getItem("displayName");
 
 if (!loggedInDisplayName) {
-  alert("You're not logged in!");
   window.location.href = "index.html";
 }
 let currentChatMessages;
@@ -17,17 +16,27 @@ function getLastMesssagesLength() {
 }
 
 function getServer(serverID) {
+  let returnedServerID;
+  let serverName;
+  let serverDes;
   fetch(
     `${server}/server${new URLSearchParams({
       serverID,
     })}`
-  ).then((res) => {
-    if (res.ok) {
-      res.json().then((json) => {
-        //
-      });
-    }
-  });
+  )
+    .then((res) => {
+      if (res.ok) {
+        res.json().then((json) => {
+          returnedServerID = res.serverID;
+          serverName = res.serverName;
+          serverDes = res.serverDes;
+        });
+      }
+    })
+    .catch((err) => {
+      return console.err(err);
+    });
+  return;
 }
 
 function sendMessage(sender, message, isGroup) {
