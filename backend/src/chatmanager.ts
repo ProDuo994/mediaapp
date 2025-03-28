@@ -32,25 +32,36 @@ function binarySearch<Sortable>(
 async function findAccountInDatabase(
   databaseName: string,
   username: string
-): Promise<Account | undefined> {
+): Promise<Account | void> {
   if (!databaseName || !username) {
     console.error("Args not provided");
     return undefined;
   }
-
   const database: Database | null = await readDatabase(databaseName);
   if (database === null) {
-    console.error("Could not find account");
-    return undefined;
+    return console.error("Could not find account");
   }
-  console.log(database.accounts[username]);
   return database.accounts[username];
 }
+
+app.post("/signup", (req: any, res: any) => {
+  let username = req.query.username;
+  let password = req.query.password;
+  if (username == null || password == null) {
+    res.status(400).send("Please add all arguments");
+  }
+  const database = readDatabase("backend/database/servers.json");
+  let account: Account = {
+    username,
+    password,
+    userID: 2,
+  };
+  return account;
+});
 
 app.post("/login", async (req: any, res: any) => {
   let username = req.query.username;
   let password = req.query.password;
-  console.log(username + "/" + password);
   let account: Account | undefined = await findAccountInDatabase(
     "database/users.json",
     username
@@ -84,8 +95,7 @@ async function writeDatabase(data: object, name: string) {
     fs.promises.writeFile(`${name}_bak.json`, existing);
     fs.promises.writeFile(name, JSON.stringify(data));
   } catch {
-    console.error("Failed to write to database");
-    return Error;
+    return console.error("Failed to write to database");
   }
 }
 
@@ -121,12 +131,10 @@ app.post("/sendmsg", async (req: any, res: any) => {
       };
       testGroup.owner = getOwnerOfGroup(testGroup.groupName);
     } else {
-      let database = await readDatabase("database/servers.json");
-      if (!database) {
-        return res.status(400);
-      }
-      newMessageInDatabase(database, fullMessage);
-      return res.status(200).json(fullMessage);
+      let target = findAccountInDatabase(
+        "backend/database/servers.json",
+        sender
+      );
     }
   } else {
     return res.status(400).send("All args not provided");
@@ -189,11 +197,10 @@ function createChat(
   chatName: string,
   chatDes: string,
   chatOwner: Account
-): Group | null {
+): Group | void {
   let exists = activeChats.find(chatName.toString);
   if (exists) {
-    console.log("Name allready exists");
-    return null;
+    return console.log("Name allready exists");
   } else {
     const newChat: Group = {
       groupName: chatName,
@@ -209,18 +216,16 @@ function createChat(
 
 async function getServerMemberUsernames(serverID: number): Promise<string> {
   let database = await readDatabase("database/servers.json");
-
   let members = {
     Ben: "Ben",
     Admin: "Admin",
   };
-  return members.Ben;
+  return members.toString();
 }
 
-async function getServerData(serverID: number): Promise<string | null> {
+async function getServerData(serverID: number): Promise<string | void> {
   if (!serverID) {
-    console.error("Must provide serverID");
-    return null;
+    return console.error("Must provide serverID");
   }
   let data = await getServerMemberUsernames(serverID);
   return data;
@@ -242,16 +247,19 @@ app.post("/createChat", (req: any, res: any) => {
 });
 
 app.get("/getChatID", (req: any, res: any) => {
+  const database = readDatabase("backend/database/servers.json");
   const chatID = { id: "1" };
   return res.status(200).send(chatID);
 });
 app.get("/getChannelMessageServer", async (req: any, res: any) => {
   const database = await readDatabase("database/servers.json");
-  let messages = database?.messages;
+  if (!database) {
+    return res.status(404).send("Could not find json database");
+  }
+  let messages = database.messages;
   if (messages) {
     return res.status(200).send(messages);
   }
-  return res.status(401).send("Could not find messages");
 });
 
 app.get("/server", (req: any, res: any) => {
@@ -259,8 +267,7 @@ app.get("/server", (req: any, res: any) => {
   if (!serverID) {
     return res.status(400).send("Must provide serverID");
   }
-  const data = getServerData(serverID);
-  return res.status(200).send(data);
+  return res.status(200).send(getServerData(serverID));
 });
 
 async function addNewAccountToDatabase(
@@ -271,8 +278,7 @@ async function addNewAccountToDatabase(
   }
   const database = await readDatabase(databaseName);
   if (database === null) {
-    console.error("No Existing Data");
-    return;
+    return console.error("No Existing Data");
   }
   database.accounts.push(newAccount);
   writeDatabase(database, databaseName);
@@ -304,8 +310,7 @@ async function findMemberInDatabase(
 
 function newMessageInDatabase(database: Database, newMessage: Message) {
   if (!database) {
-    console.error("No Existing Data");
-    return;
+    return console.error("No Existing Data");
   }
   database.messages.push(newMessage);
   return database.messages;
@@ -323,8 +328,7 @@ app.get("/getChatMessages", async (req: any, res: any) => {
   if (database.messages == undefined) {
     return res.status(404).send("Could not find messages");
   }
-  let messages = database.messages;
-  res.status(200).send(messages);
+  return res.status(200).send(database.messages);
 });
 
 app.listen(PORT, () => {

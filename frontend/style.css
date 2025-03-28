@@ -84,7 +84,7 @@ body {
   background-color: blueviolet;
   font-family: monospace;
   align-items: center;
-  height: 45px;
+  height: 41px;
 }
 
 .menuButton {
@@ -117,7 +117,7 @@ body {
 
 .channelList {
   height: 100%;
-  width: 150px;
+  width: 130px;
   background-color: rgb(63, 109, 110);
   display: flex;
   flex-direction: column;
@@ -274,6 +274,8 @@ dialog {
   }
 
   .memberList {
+    margin-left: auto;
+    justify-content: space-between;
     width: 150px;
   }
 }

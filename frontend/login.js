@@ -6,8 +6,38 @@ function processLogin(displayName) {
   window.location.href = "chat.html";
 }
 
+function signup(username, password) {
+  fetch(
+    `${server}/signup${new URLSearchParams({
+      username,
+      password,
+    })}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Content-Type-Options": "nosniff",
+      },
+      body: JSON.stringify({
+        username,
+        password,
+      }),
+    }
+  )
+    .then((res) => {
+      console.log("received response");
+      if (res.ok) {
+        res.json().then(() => {
+          window.location.href = "chat.html";
+        });
+      } else {
+        return console.log("Could not signup");
+      }
+    })
+    .catch((err) => console.error(err));
+}
+
 function login(username, password) {
-  console.log(`Running login: fetching ${server}/login`);
   loginButton.disabled = true;
   fetch(
     `${server}/login?${new URLSearchParams({
@@ -36,13 +66,22 @@ function login(username, password) {
         window.alert("Username or Password incorrect!");
         loginButton.disabled = false;
       }
-    }) // waits for response then prints to log
+    })
     .catch((err) => console.error(err));
 }
 
 window.onload = () => {
   const loginForm = document.getElementById("loginForm");
   loginButton = document.getElementById("loginBtn");
+  signupButton = document.getElementById("signupBtn");
+
+  signupButton.addEventListener("click", (event) => {
+    event.preventDefault();
+    signup(
+      document.getElementById("usrname").value,
+      document.getElementById("pswrd").value
+    );
+  });
 
   loginForm.addEventListener("submit", (event) => {
     event.preventDefault();

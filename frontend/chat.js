@@ -177,7 +177,7 @@ function createChannel(chatName, channelName) {}
 
 function pollMessages(serverID) {
   fetch(
-    `${server}/getChatMessages?${new URLSearchParams({
+    `${server}/getChannelMessageServer?${new URLSearchParams({
       serverID: serverID,
     })}`,
     {
@@ -190,7 +190,10 @@ function pollMessages(serverID) {
   )
     .then((res) => {
       const server1 = res["SERVER 1"];
-      const channel1Messages = server1["Channel 1"].messages;
+      const channel1Messages = server1["Channel 1"]["messages"];
+      if (channel1Messages == null) {
+        return res.status(400).send("No new messages");
+      }
       if (channel1Messages.length > lastAmountOfMessages) {
         for (const message of channel1Messages) {
           createAndAppend(
@@ -278,7 +281,7 @@ messageBoxInput.addEventListener("keydown", (event) => {
     messageBoxInput.value = "";
     createAndAppend("h4", messageViewBox, loggedInDisplayName + ": " + message);
     messageHistory.push(message);
-    sendMessage(accountName, message, false);
+    sendMessage(loggedInDisplayName, message, false);
   }
 });
 
