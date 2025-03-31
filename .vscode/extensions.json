@@ -3,6 +3,7 @@
     "github.vscode-pull-request-github",
     "dbaeumer.vscode-eslint",
     "yandeu.five-server",
-    "esbenp.prettier-vscode"
+    "esbenp.prettier-vscode",
+    "formulahendry.auto-rename-tag"
   ]
 }

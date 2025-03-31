@@ -286,7 +286,11 @@ messageBoxInput.addEventListener("keydown", (event) => {
 });
 
 function loadServerData(serverID) {
-  let database = "../backend/database.json";
+  const database = "../backend/database.json";
+  const serverList = document.getElementById("serverList");
+  for (let i = 1; i <= 3; i++) {
+    createAndAppend("li", serverList, `Server ${i}`);
+  }
 }
 
 function saveServerData(serverID) {
@@ -301,7 +305,6 @@ function addFriend(userID) {
 
 window.onload = () => {
   currentChatMessages = document.getElementById("channelMessages").children;
-
   loadServerData(getChatID(ServerName));
   const msgReceiveInteval = setInterval(pollMessages(0), 1000);
 };

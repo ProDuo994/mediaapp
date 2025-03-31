@@ -1,8 +1,9 @@
 import express from "express";
 import cors from "cors";
-import fs, { accessSync } from "fs";
+import fs, { accessSync, read } from "fs";
 import bcrypt from "bcrypt";
 import { Group, Account, Message, Database, Member } from "./types/types";
+import { group } from "console";
 const app = express();
 app.use(express.json());
 app.use(
@@ -99,13 +100,16 @@ async function writeDatabase(data: object, name: string) {
   }
 }
 
-function getOwnerOfGroup(groupName: string) {
+function getOwnerOfGroup(groupName: string): Member | null {
   const owner: Member = {
     username: "",
     password: "",
     displayName: "",
     userID: 0,
   };
+  if (owner == undefined) {
+    return null;
+  }
   return owner;
 }
 
@@ -118,23 +122,14 @@ app.post("/sendmsg", async (req: any, res: any) => {
     account.displayName = account.username;
   }
   if (sender !== undefined && message !== undefined && account) {
-    let fullMessage = formatMessage(account.displayName, message, 0);
+    const fullMessage = formatMessage(account.displayName, message, 0);
     console.log("[CHATMANAGER/MESSAGE]: " + fullMessage);
     if (type == "group") {
-      const testGroup: Group = {
-        groupName: "",
-        groupDescription: "",
-        members: [],
-        owner: undefined,
-        isPublic: false,
-        id: 0,
-      };
-      testGroup.owner = getOwnerOfGroup(testGroup.groupName);
     } else {
-      let target = findAccountInDatabase(
-        "backend/database/servers.json",
-        sender
-      );
+      const database = await readDatabase("database/servers.json");
+      if (database == undefined) {
+        return res.status();
+      }
     }
   } else {
     return res.status(400).send("All args not provided");
@@ -151,7 +146,16 @@ async function updateSettings(
     console.error("Could not find database");
     return false;
   }
-  let groupToUpdate: Group | undefined = undefined;
+  let groupMembers: Member[] = [];
+  let groupToUpdate: Group = {
+    groupName: oldServerName,
+    groupDescription: serverDes,
+    isPublic: isVisible,
+    id: 1,
+    owner: undefined,
+    members: groupMembers,
+  };
+
   return groupToUpdate;
 }
 
@@ -161,15 +165,16 @@ app.post("/updateSettings", (req: any, res: any) => {
   let isVisible = req.body.isVisible;
   let canMessage = req.body.canMessage;
   updateSettings(serverName, serverDes, isVisible);
-  res.status(200);
+  res.status(200).send("Settings updated");
 });
 
 async function readDatabase(name: string): Promise<Database | null> {
   try {
     const data = await fs.promises.readFile(name, "utf8");
     return JSON.parse(data);
-  } catch {
+  } catch (e) {
     console.error("Could not read database");
+    console.error(e);
     return null;
   }
 }
@@ -247,7 +252,7 @@ app.post("/createChat", (req: any, res: any) => {
 });
 
 app.get("/getChatID", (req: any, res: any) => {
-  const database = readDatabase("backend/database/servers.json");
+  const database = readDatabase("database/servers.json");
   const chatID = { id: "1" };
   return res.status(200).send(chatID);
 });
@@ -306,14 +311,6 @@ async function findMemberInDatabase(
       }
     : undefined;
   return member;
-}
-
-function newMessageInDatabase(database: Database, newMessage: Message) {
-  if (!database) {
-    return console.error("No Existing Data");
-  }
-  database.messages.push(newMessage);
-  return database.messages;
 }
 
 app.get("/getChatMessages", async (req: any, res: any) => {

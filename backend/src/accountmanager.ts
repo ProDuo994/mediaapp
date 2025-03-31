@@ -1,7 +1,7 @@
-import { User } from "./types/types";
+import { Account } from "./types/types";
 import fs from "fs";
 
-let Users: User[] = [];
+let Users: Account[] = [];
 
 function findUserfromName(username: string) {
   for (let i = 0; i < Users.length; i++) {
@@ -61,7 +61,7 @@ function getNewUserId() {
 function createAccount(username: string, password: string) {
   // create account and save it to the JSON file
   const userId = getNewUserId();
-  const newUser: User = {
+  const newUser: Account = {
     username,
     password,
     userID: userId,
