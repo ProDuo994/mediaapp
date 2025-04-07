@@ -263,6 +263,8 @@ dialog {
   border: none;
   border-radius: 8px;
   padding: 20px;
+  align-self: center;
+  margin-left: 600px;
 }
 
 #serverList {
@@ -277,6 +279,11 @@ dialog {
 #serverList li:hover {
   color: lightblue;
   cursor: pointer;
+}
+
+.messageButtons {
+  background-color: aqua;
+  border-radius: 30%;
 }
 
 @media screen and (max-width: 600px) {

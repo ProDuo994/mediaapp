@@ -25,6 +25,14 @@
         </form>
       </div>
     </dialog>
+    <dialog class="uploadImageGUI" id="uploadImageGUI">
+      <input type="file" name="File:" id="" accept=".jpeg, .jpg, .png, .svg, .gif">
+      <button id="closeUploadGui">Close</button>
+      <img src=""/>
+    </dialog>
+    <dialog>
+      <h5>Voice Recording</h5>
+    </dialog>
     <dialog class="channelSettingsGUI" id="channelSettingsGUI">
       <form>
         <h1>Settings</h1>
@@ -68,7 +76,6 @@
       <aside class="serverListContainer">
         <ul id="serverList">
           <h2>Servers</h2>
-          <!-- <li>Hello</li> -->
         </ul>
       </aside>
       <div class="channelList">
@@ -90,7 +97,9 @@
           <h3></h3>
         </div>
         <div class="messageBox">
-          <input autocomplete="false" type="text" id="messageBoxInput" />
+          <button id="sendImaageButton" class="messageButtons">Image</button>
+          <button id="sendVoiceButton" class="messageButtons">Voice</button>
+          <input autocomplete="false" type="text" id="messageBoxInput" spellcheck="false"/>
         </div>
       </div>
       <div class="memberList">

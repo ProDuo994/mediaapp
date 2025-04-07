@@ -224,7 +224,9 @@ const visibleCheckbox = document.getElementById("visibleCheckbox");
 const messageCheckbox = document.getElementById("messageCheckbox");
 const channelNameInput = document.getElementById("channelNameBox");
 const channelDesInput = document.getElementById("chanelDesBox");
-
+const sendImageButton = document.getElementById("sendImaageButton");
+const sendVoiceButton = document.getElementById("sendVoiceButton");
+const closeUploadGuiButton = document.getElementById("closeUploadGui");
 let channelName = "Test Server";
 let channelDes = "Test Description";
 let visible = true;
@@ -244,6 +246,18 @@ function updateSettings() {
   canMessage = messageCheckbox.checked;
   updateSettingsEndpoint(channelName, channelDes, visible, canMessage);
 }
+
+sendVoiceButton.addEventListener("click", (event) => {
+  console.log("Press");
+});
+
+sendImageButton.addEventListener("click", (event) => {
+  document.getElementById("uploadImageGUI").showModal();
+});
+
+closeUploadGuiButton.addEventListener("click", (event) => {
+  document.getElementById("uploadImageGUI").close();
+});
 
 channelSettingsButton.addEventListener("click", (event) => {
   channelSettingsGui.showModal();
@@ -275,6 +289,19 @@ channelSettingsClose.addEventListener("click", (event) => {
   channelSettingsGui.close();
 });
 
+sendVoiceButton.addEventListener("click", (event) => {
+  navigator.mediaDevices
+    .getUserMedia({ audio: true })
+    .then((stream) => {
+      window.localStream = stream;
+      window.localAudio.srcObject = stream;
+      window.localAudio.autoplay = true;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+});
+
 messageBoxInput.addEventListener("keydown", (event) => {
   if (event.key === "Enter") {
     const message = messageBoxInput.value;
@@ -300,6 +327,7 @@ function saveServerData(serverID) {
 }
 
 function addFriend(userID) {
+  alert("Sucsessfully added friend!");
   console.log("Friend Added With ID: " + userID);
 }
 
