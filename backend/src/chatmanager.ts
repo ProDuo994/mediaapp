@@ -1,9 +1,8 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import cors from "cors";
 import fs, { accessSync, read } from "fs";
 import bcrypt from "bcrypt";
 import { Group, Account, Message, Database, Member } from "./types/types";
-import { group } from "console";
 const app = express();
 app.use(express.json());
 app.use(
@@ -128,34 +127,36 @@ function getOwnerOfGroup(groupName: string): Member | null {
   return owner;
 }
 
-app.post("/sendmsg", async (req: any, res: any) => {
-  let sender: string = req.body.sender;
-  let message: string = req.body.message;
-  let isGroup: boolean = req.body.isGroup;
-  let account = await findMemberInDatabase(sender, usersDatabase);
-  if (account == undefined) {
-    return res.status(404).send("Could not find account");
-  }
-  if (
-    sender !== undefined &&
-    message !== undefined &&
-    account?.username !== null
-  ) {
-    if (!account || account?.displayName === undefined) {
-      return res.status(400).send("Display name is undefined");
-    }
-    const fullMessage = formatMessage(account.displayName, message, 0);
-    console.log("[CHATMANAGER/MESSAGE]: " + fullMessage);
-    if (isGroup == true) {
-    } else {
-      const database = await readDatabase("database/servers.json");
-      if (database == undefined) {
-        return res.status(400).send("Could not find database");
-      }
-    }
-  } else {
+app.post("/sendmsg", async (req: Request, res: Response) => {
+  const { sender, message, isGroup } = req.body;
+  if (!sender || !message) {
     console.error("All args not provided");
     return res.status(400).send("All args not provided");
+  }
+
+  const account = await findMemberInDatabase(sender, usersDatabase);
+  if (!account) {
+    console.error("ERROR: Could not find account in database/chatmanager:137");
+    return res.status(404).send("Could not find account");
+  }
+
+  if (!account.displayName) {
+    return res.status(400).send("Display name is undefined");
+  }
+
+  const fullMessage = formatMessage(account.displayName, message, 0);
+  console.log("[CHATMANAGER/MESSAGE]: " + fullMessage);
+
+  if (isGroup === true) {
+    return res
+      .status(200)
+      .send("Group message received (logic not implemented)");
+  } else {
+    const database = await readDatabase("database/servers.json");
+    if (!database) {
+      return res.status(400).send("Could not find database");
+    }
+    return res.status(200).send("Direct message sent (logic placeholder)");
   }
 });
 
@@ -182,7 +183,7 @@ async function updateSettings(
   return groupToUpdate;
 }
 
-app.post("/updateSettings", async (req: any, res: any) => {
+app.post("/updateSettings", async (req: Request, res: Response) => {
   let serverName = req.body.serverName;
   let serverDes = req.body.serverDes;
   let isVisible = req.body.isVisible;
@@ -325,7 +326,7 @@ async function findMemberInDatabase(
   return member;
 }
 
-app.get("/getChatMessages", async (req: any, res: any) => {
+app.get("/getChatMessages", async (req: Request, res: any) => {
   let serverID = req.query["serverID"];
   if (serverID == undefined) {
     return res.status(400).send("Must provide server ID");
