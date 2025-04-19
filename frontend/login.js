@@ -7,23 +7,17 @@ function processLogin(displayName) {
 }
 
 function signup(username, password) {
-  fetch(
-    `${server}/signup${new URLSearchParams({
+  fetch(`${server}/signup`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Content-Type-Options": "nosniff",
+    },
+    body: JSON.stringify({
       username,
       password,
-    })}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Content-Type-Options": "nosniff",
-      },
-      body: JSON.stringify({
-        username,
-        password,
-      }),
-    }
-  )
+    }),
+  })
     .then((res) => {
       console.log("received response");
       if (res.ok) {
@@ -39,23 +33,17 @@ function signup(username, password) {
 
 function login(username, password) {
   loginButton.disabled = true;
-  fetch(
-    `${server}/login?${new URLSearchParams({
+  fetch(`${server}/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Content-Type-Options": "nosniff",
+    },
+    body: JSON.stringify({
       username,
       password,
-    })}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Content-Type-Options": "nosniff",
-      },
-      body: JSON.stringify({
-        username,
-        password,
-      }),
-    }
-  )
+    }),
+  })
     .then((res) => {
       if (res.ok) {
         res.json().then((account) => {

@@ -49,7 +49,7 @@ body {
 
 .navigation li a {
   padding: 14px 16px;
-  font-size: 50;
+  font-size: 50px;
   text-decoration: none;
   color: black;
   display: block;
@@ -85,6 +85,10 @@ body {
   font-family: monospace;
   align-items: center;
   height: 41px;
+  box-shadow: rgba(209, 217, 224, 0.7) 0px -1px 0px 0px inset;
+  box-sizing: border-box;
+  unicode-bidi: isolate;
+  line-height: 21px;
 }
 
 .menuButton {
@@ -147,6 +151,7 @@ body {
   height: 89%;
   overflow-y: auto;
   overflow-x: hidden;
+  scroll-behavior: smooth;
 }
 
 .messageBox {
@@ -172,6 +177,7 @@ body {
   width: 150px;
   height: 25px;
   padding-bottom: 3px;
+  position: relative;
 }
 
 .account:hover {
@@ -194,6 +200,7 @@ body {
 .accountPage {
   display: none;
   position: absolute;
+  top: 100%;
   background-color: blueviolet;
   width: 200px;
   right: 150px;
@@ -264,7 +271,8 @@ dialog {
   border-radius: 8px;
   padding: 20px;
   align-self: center;
-  margin-left: 600px;
+  max-width: 90%;
+  width: 210px;
 }
 
 #serverList {

@@ -59,8 +59,8 @@ async function findAccountInDatabase(
 }
 
 app.post("/signup", async (req: any, res: any) => {
-  let username = req.query.username;
-  let password = req.query.password;
+  let username = req.body.username;
+  let password = req.body.password;
   if (username == null || password == null) {
     res.status(400).send("Please add all arguments");
   }
@@ -298,7 +298,7 @@ async function addNewAccountToDatabase(
     return console.error("No Existing Data");
   }
   database.accounts.push(newAccount);
-  writeDatabase(database, databaseName);
+  await writeDatabase(database, databaseName);
 }
 
 async function findMemberInDatabase(

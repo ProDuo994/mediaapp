@@ -242,10 +242,6 @@ function updateSettings() {
   updateSettingsEndpoint(channelName, channelDes, visible, canMessage);
 }
 
-sendVoiceButton.addEventListener("click", (event) => {
-  console.log("Press");
-});
-
 sendImageButton.addEventListener("click", (event) => {
   document.getElementById("uploadImageGUI").showModal();
 });
