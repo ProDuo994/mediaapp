@@ -101,7 +101,13 @@ app.post("/login", async (req: Request, res: Response): Promise<any> => {
     return res.status(400).send("Could not find account");
   }
   if (password === account.password) {
-    console.log(username + " logged in");
+    console.log(
+      username +
+        " logged in at " +
+        new Date().toLocaleDateString() +
+        " " +
+        new Date().toLocaleTimeString()
+    );
     return res.status(200).send(account);
   } else {
     return res.status(401).send("Incorrect Username/Password");
@@ -114,7 +120,7 @@ app.post("/addFreind", async (req: Request, res: Response): Promise<any> => {
   if (username == null || friendName == null) {
     return res.status(400).send("Please add all arguments");
   }
-  const database = readDatabase(usersDatabase);
+  const database = await readDatabase(usersDatabase);
   if (database === null) {
     return res.status(404).send("Could not find database");
   }
@@ -151,7 +157,7 @@ function formatMessage(
     sender,
     message,
     timesent,
-    };
+  };
 }
 
 async function writeDatabase(data: object, name: string) {
@@ -185,10 +191,19 @@ app.post("/sendmsg", async (req: Request, res: Response): Promise<any> => {
     return res.status(400).send("All args not provided");
   }
   let database = await readDatabase(usersDatabase);
-  const username = await findUsernameByDisplayName(sender)
+  const username = await findUsernameByDisplayName(sender);
   console.log(database);
-  const account: Account = database?.accounts.find(username);
-  if (!account) {
+  if (!database?.accounts) {
+    console.error("Could not find database/chatmanager:136");
+    return res.status(404).send("Could not find database");
+  }
+  const account: Account = binarySearch(
+    Object.values(database?.accounts || {}),
+    0,
+    Object.values(database?.accounts || {}).length,
+    username
+  );
+  if (!account || typeof account !== "object") {
     console.error("ERROR: Could not find account in database/chatmanager:137");
     return res.status(404).send("Could not find account");
   }

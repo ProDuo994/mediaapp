@@ -12,6 +12,7 @@ function signup(username, password) {
     headers: {
       "Content-Type": "application/json",
       "X-Content-Type-Options": "nosniff",
+      origin: "*",
     },
     body: JSON.stringify({
       username,
@@ -38,6 +39,7 @@ function login(username, password) {
     headers: {
       "Content-Type": "application/json",
       "X-Content-Type-Options": "nosniff",
+      origin: "*",
     },
     body: JSON.stringify({
       username,

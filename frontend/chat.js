@@ -39,6 +39,7 @@ function sendMessage(sender, message, isGroup) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        origin: "*",
       },
       body: JSON.stringify({ sender, message, isGroup }),
     })
@@ -65,6 +66,7 @@ function createChat(name, des) {
     headers: {
       "Content-Type": "application/json",
       "X-Content-Type-Options": "nosniff",
+      origin: "*",
     },
     body: JSON.stringify({
       name,
@@ -79,6 +81,7 @@ async function getChatID(name) {
     headers: {
       "Content-Type": "application/json",
       "X-Content-Type-Options": "nosniff",
+      origin: "*",
     },
   });
   if (!res.ok) return null;
@@ -102,6 +105,7 @@ function getMessageFromServer(serverID) {
         headers: {
           "Content-Type": "application/json",
           "X-Content-Type-Options": "nosniff",
+          origin: "*",
         },
       }
     )
@@ -134,6 +138,7 @@ function getChannelMessageServer(name) {
     headers: {
       "Content-Type": "application/json",
       "X-Content-Type-Options": "nosniff",
+      origin: "*",
     },
   }).then((res) => {
     res.json().then((json) => {
@@ -156,6 +161,7 @@ function updateSettingsEndpoint(serverName, serverDes, isVisible, canMessage) {
     headers: {
       "Content-Type": "application/json",
       "X-Content-Type-Options": "nosniff",
+      origin: "*",
     },
     body: JSON.stringify({
       serverName,
@@ -163,7 +169,13 @@ function updateSettingsEndpoint(serverName, serverDes, isVisible, canMessage) {
       isVisible,
       canMessage,
     }),
-  });
+  })
+    .then((res) => {
+      if (!res.ok) throw new Error("Failed to update settings");
+      return res.json();
+    })
+    .then((data) => console.log("Settings updated:", data))
+    .catch((err) => console.error(err));
 }
 
 function createChannel(chatName, channelName) {
@@ -172,9 +184,9 @@ function createChannel(chatName, channelName) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ chatName, channelName }),
   })
-    .then(res => res.json())
-    .then(data => console.log("Channel created:", data))
-    .catch(err => console.error("Error creating channel:", err));
+    .then((res) => res.json())
+    .then((data) => console.log("Channel created:", data))
+    .catch((err) => console.error("Error creating channel:", err));
 }
 
 async function pollMessages(serverID) {
