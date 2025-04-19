@@ -9,12 +9,11 @@ let currentChatMessages;
 const chatMessagesFromServer = {};
 let ServerName = "server";
 let messageHistory = [];
-let lastAmountOfMessages = getLastMesssagesLength();
-
-function getLastMesssagesLength() {
+function getLastMessagesLength() {
   const amount = messageHistory.length;
   return amount;
 }
+let lastAmountOfMessages = getLastMessagesLength();
 
 function getServer(serverID) {
   fetch(
@@ -144,10 +143,10 @@ function getChannelMessageServer(name) {
 }
 
 function getMessagesFromClient() {
-  let messages = {
-    Admin: "Hello",
-    Admin: "Hi",
-  };
+  let messages = [
+    { sender: "Admin", message: "Welcome to the server!" },
+    { sender: "Admin", message: "Hello everyone!" },
+  ];
   return messages;
 }
 
@@ -167,7 +166,16 @@ function updateSettingsEndpoint(serverName, serverDes, isVisible, canMessage) {
   });
 }
 
-function createChannel(chatName, channelName) {}
+function createChannel(chatName, channelName) {
+  fetch(`${server}/createChannel`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ chatName, channelName }),
+  })
+    .then(res => res.json())
+    .then(data => console.log("Channel created:", data))
+    .catch(err => console.error("Error creating channel:", err));
+}
 
 async function pollMessages(serverID) {
   fetch(
@@ -191,7 +199,7 @@ async function pollMessages(serverID) {
       }
 
       if (channelMessages.length > lastAmountOfMessages) {
-        for (const message of channelMessages) {
+        for (const message of channelMessages.slice(lastAmountOfMessages)) {
           createAndAppend(
             "p",
             messageViewBox,
@@ -222,6 +230,7 @@ const channelDesInput = document.getElementById("chanelDesBox");
 const sendImageButton = document.getElementById("sendImaageButton");
 const sendVoiceButton = document.getElementById("sendVoiceButton");
 const closeUploadGuiButton = document.getElementById("closeUploadGui");
+const messageBoxInput = document.getElementById("messageBoxInput");
 let channelName = "Test Server";
 let channelDes = "Test Description";
 let visible = true;
@@ -312,14 +321,23 @@ function loadServerData(serverID) {
 }
 
 function saveServerData(serverID) {
-  let database = "../backend/database.json";
-  let currentMessages = getMessagesFromClient();
+  const database = "../backend/database.json";
+  const currentMessages = getMessagesFromClient();
   database.messages = currentMessages;
 }
 
 function addFriend(userID) {
   alert("Sucsessfully added friend!");
-  console.log("Friend Added With ID: " + userID);
+  fetch(`${server}/addFriend`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Content-Type-Options": "nosniff",
+    },
+    body: JSON.stringify({
+      userID,
+    }),
+  });
 }
 
 window.onload = () => {

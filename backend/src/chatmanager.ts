@@ -108,6 +108,40 @@ app.post("/login", async (req: Request, res: Response): Promise<any> => {
   }
 });
 
+app.post("/addFreind", async (req: Request, res: Response): Promise<any> => {
+  let username = req.body.username;
+  let friendName = req.body.friendName;
+  if (username == null || friendName == null) {
+    return res.status(400).send("Please add all arguments");
+  }
+  const database = readDatabase(usersDatabase);
+  if (database === null) {
+    return res.status(404).send("Could not find database");
+  }
+  let account: Account | void = database.accounts[username];
+  if (account === undefined) {
+    return res.status(404).send("Could not find account");
+  }
+  return res.status(200).send(account);
+});
+
+app.post("createChannel", async (req: Request, res: Response): Promise<any> => {
+  let channelName = req.body.channelName;
+  let channelDes = req.body.channelDes;
+  let channelOwner = req.body.channelOwner;
+  if (channelName == null || channelDes == null || channelOwner == null) {
+    return res.status(400).send("Please add all arguments");
+  }
+  const database = await readDatabase(usersDatabase);
+  if (database === null) {
+    return res.status(404).send("Could not find database");
+  }
+  let account: Account | void = database.accounts[channelOwner];
+  if (account === undefined) {
+    return res.status(404).send("Could not find account");
+  }
+});
+
 function formatMessage(
   sender: string,
   message: string,
@@ -117,7 +151,7 @@ function formatMessage(
     sender,
     message,
     timesent,
-  };
+    };
 }
 
 async function writeDatabase(data: object, name: string) {
@@ -300,12 +334,13 @@ app.get(
   }
 );
 
-app.get("/server", (req: Request, res: Response): Promise<any> => {
+app.get("/server", async (req: Request, res: Response): Promise<any> => {
   const serverID: number = req.query["serverID"];
   if (!serverID) {
     return res.status(400).send("Must provide serverID");
   }
-  return res.status(200).send(getServerData(serverID));
+  const serverData = await getServerData(serverID);
+  return res.status(200).send(serverData);
 });
 
 async function addNewAccountToDatabase(

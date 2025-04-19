@@ -85,7 +85,7 @@ body {
   font-family: monospace;
   align-items: center;
   height: 41px;
-  box-shadow: rgba(209, 217, 224, 0.7) 0px -1px 0px 0px inset;
+  box-shadow: rgba(58, 24, 209, 0.7) 0px -1px 0px 0px inset;
   box-sizing: border-box;
   unicode-bidi: isolate;
   line-height: 21px;
