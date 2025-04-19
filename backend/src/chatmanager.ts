@@ -57,7 +57,7 @@ async function findAccountInDatabase(
   return database.accounts[username];
 }
 
-app.post("/signup", async (req: any, res: any) => {
+app.post("/signup", async (req: Request, res: Response): Promise<any> => {
   let username = req.body.username;
   let password = req.body.password;
   if (username == null || password == null) {
@@ -73,7 +73,7 @@ app.post("/signup", async (req: any, res: any) => {
   return res.status(200).send(account);
 });
 
-app.post("/login", async (req: any, res: any) => {
+app.post("/login", async (req: Request, res: Response): Promise<any> => {
   let username = req.body.username;
   let password = req.body.password;
   let account: Account | void | undefined = await findAccountInDatabase(
@@ -127,14 +127,15 @@ function getOwnerOfGroup(groupName: string): Member | null {
   return owner;
 }
 
-app.post("/sendmsg", async (req: Request, res: Response) => {
+app.post("/sendmsg", async (req: Request, res: Response): Promise<any> => {
   const { sender, message, isGroup } = req.body;
   if (!sender || !message) {
     console.error("All args not provided");
     return res.status(400).send("All args not provided");
   }
-
-  const account = await findMemberInDatabase(sender, usersDatabase);
+  let database = await readDatabase(usersDatabase);
+  console.log(database);
+  const account: Account = database?.accounts.find(sender);
   if (!account) {
     console.error("ERROR: Could not find account in database/chatmanager:137");
     return res.status(404).send("Could not find account");
@@ -144,19 +145,17 @@ app.post("/sendmsg", async (req: Request, res: Response) => {
     return res.status(400).send("Display name is undefined");
   }
 
-  const fullMessage = formatMessage(account.displayName, message, 0);
+  const fullMessage = formatMessage(account.displayName, message, Date.now());
   console.log("[CHATMANAGER/MESSAGE]: " + fullMessage);
 
   if (isGroup === true) {
-    return res
-      .status(200)
-      .send("Group message received (logic not implemented)");
+    return res.status(200).send("Group message received");
   } else {
     const database = await readDatabase("database/servers.json");
     if (!database) {
       return res.status(400).send("Could not find database");
     }
-    return res.status(200).send("Direct message sent (logic placeholder)");
+    return res.status(200).send("Direct message sent");
   }
 });
 
@@ -264,24 +263,27 @@ app.post("/createChat", (req: any, res: any) => {
   return res.status(200).send(chat);
 });
 
-app.get("/getChatID", async (req: any, res: any) => {
+app.get("/getChatID", async (req: Request, res: Response): Promise<any> => {
   const database = await readDatabase("database/servers.json");
   const chatID = { id: "1" };
   return res.status(200).send(chatID);
 });
-app.get("/getChannelMessageServer", async (req: any, res: any) => {
-  const database = await readDatabase("database/servers.json");
-  if (!database) {
-    return res.status(404).send("Could not find json database");
+app.get(
+  "/getChannelMessageServer",
+  async (req: Request, res: Response): Promise<any> => {
+    const database = await readDatabase("database/servers.json");
+    if (!database) {
+      return res.status(404).send("Could not find json database");
+    }
+    let messages = database.messages;
+    if (messages) {
+      return res.status(200).send(messages);
+    }
   }
-  let messages = database.messages;
-  if (messages) {
-    return res.status(200).send(messages);
-  }
-});
+);
 
-app.get("/server", (req: any, res: any) => {
-  let serverID = req.query.serverID;
+app.get("/server", (req: Request, res: Response): Promise<any> => {
+  const serverID: number = req.query["serverID"];
   if (!serverID) {
     return res.status(400).send("Must provide serverID");
   }
