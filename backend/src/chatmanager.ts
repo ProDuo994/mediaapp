@@ -3,6 +3,7 @@ import cors from "cors";
 import fs, { accessSync, read } from "fs";
 import bcrypt from "bcrypt";
 import { Group, Account, Message, Database, Member } from "./types/types";
+import { send } from "process";
 const app = express();
 app.use(express.json());
 app.use(
@@ -40,6 +41,22 @@ function binarySearch<Sortable>(
     return binarySearch(arr, mid + 1, high, toFind);
   }
   return -1;
+}
+
+async function findUsernameByDisplayName(
+  displayName: string
+): Promise<string | null> {
+  const database = await readDatabase(usersDatabase);
+  if (!database) {
+    console.error("Could not read database");
+    return null;
+  }
+  for (const username in database.accounts) {
+    if (database.accounts[username].displayName === displayName) {
+      return username;
+    }
+  }
+  return null;
 }
 
 async function findAccountInDatabase(
@@ -134,8 +151,9 @@ app.post("/sendmsg", async (req: Request, res: Response): Promise<any> => {
     return res.status(400).send("All args not provided");
   }
   let database = await readDatabase(usersDatabase);
+  const username = await findUsernameByDisplayName(sender)
   console.log(database);
-  const account: Account = database?.accounts.find(sender);
+  const account: Account = database?.accounts.find(username);
   if (!account) {
     console.error("ERROR: Could not find account in database/chatmanager:137");
     return res.status(404).send("Could not find account");
