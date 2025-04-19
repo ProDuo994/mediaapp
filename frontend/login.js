@@ -1,4 +1,4 @@
-const server = "http://192.168.2.55:3000";
+const server = "http://192.168.68.115:3000";
 let loginButton;
 
 function processLogin(displayName) {
@@ -57,7 +57,6 @@ function login(username, password) {
     }
   )
     .then((res) => {
-      console.log("received response");
       if (res.ok) {
         res.json().then((account) => {
           processLogin(account.displayName);

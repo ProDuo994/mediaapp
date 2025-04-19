@@ -12,8 +12,21 @@ app.use(
     credentials: true,
   })
 );
-const PORT = 3000;
+const PORT: number = 3000;
 let activeChats: string[] = [];
+const serverDatabase: string = "database/servers.json";
+const usersDatabase: string = "database/users.json";
+
+async function readDatabase(name: string): Promise<Database | null> {
+  try {
+    const data = await fs.promises.readFile(name, "utf8");
+    return JSON.parse(data);
+  } catch (e) {
+    console.error("Could not read database");
+    console.error(e);
+    return null;
+  }
+}
 
 function binarySearch<Sortable>(
   arr: Sortable[],
@@ -45,32 +58,34 @@ async function findAccountInDatabase(
   return database.accounts[username];
 }
 
-app.post("/signup", (req: any, res: any) => {
+app.post("/signup", async (req: any, res: any) => {
   let username = req.query.username;
   let password = req.query.password;
   if (username == null || password == null) {
     res.status(400).send("Please add all arguments");
   }
-  const database = readDatabase("backend/database/servers.json");
+  const database = await readDatabase(serverDatabase);
   let account: Account = {
     username,
     password,
     userID: 2,
   };
-  return account;
+  await addNewAccountToDatabase(usersDatabase, account);
+  return res.status(200).send(account);
 });
 
 app.post("/login", async (req: any, res: any) => {
-  let username = req.query.username;
-  let password = req.query.password;
-  let account: Account | undefined = await findAccountInDatabase(
-    "database/users.json",
+  let username = req.body.username;
+  let password = req.body.password;
+  let account: Account | void | undefined = await findAccountInDatabase(
+    usersDatabase,
     username
   );
   if (account === undefined) {
     return res.status(400).send("Could not find account");
   }
   if (password === account.password) {
+    console.log(username + " logged in");
     return res.status(200).send(account);
   } else {
     return res.status(401).send("Incorrect Username/Password");
@@ -93,8 +108,8 @@ async function writeDatabase(data: object, name: string) {
   if (!data) return console.log("No Data found");
   try {
     const existing: any = await readDatabase(name);
-    fs.promises.writeFile(`${name}_bak.json`, existing);
-    fs.promises.writeFile(name, JSON.stringify(data));
+    await fs.promises.writeFile(`${name}_bak.json`, existing);
+    await fs.promises.writeFile(name, JSON.stringify(data));
   } catch {
     return console.error("Failed to write to database");
   }
@@ -116,22 +131,30 @@ function getOwnerOfGroup(groupName: string): Member | null {
 app.post("/sendmsg", async (req: any, res: any) => {
   let sender: string = req.body.sender;
   let message: string = req.body.message;
-  let type: string = req.body.type;
-  let account = await findMemberInDatabase(sender, "database/users");
-  if (account && account.displayName === undefined) {
-    account.displayName = account.username;
+  let isGroup: boolean = req.body.isGroup;
+  let account = await findMemberInDatabase(sender, usersDatabase);
+  if (account == undefined) {
+    return res.status(404).send("Could not find account");
   }
-  if (sender !== undefined && message !== undefined && account) {
+  if (
+    sender !== undefined &&
+    message !== undefined &&
+    account?.username !== null
+  ) {
+    if (!account || account?.displayName === undefined) {
+      return res.status(400).send("Display name is undefined");
+    }
     const fullMessage = formatMessage(account.displayName, message, 0);
     console.log("[CHATMANAGER/MESSAGE]: " + fullMessage);
-    if (type == "group") {
+    if (isGroup == true) {
     } else {
       const database = await readDatabase("database/servers.json");
       if (database == undefined) {
-        return res.status();
+        return res.status(400).send("Could not find database");
       }
     }
   } else {
+    console.error("All args not provided");
     return res.status(400).send("All args not provided");
   }
 });
@@ -159,28 +182,17 @@ async function updateSettings(
   return groupToUpdate;
 }
 
-app.post("/updateSettings", (req: any, res: any) => {
+app.post("/updateSettings", async (req: any, res: any) => {
   let serverName = req.body.serverName;
   let serverDes = req.body.serverDes;
   let isVisible = req.body.isVisible;
   let canMessage = req.body.canMessage;
-  updateSettings(serverName, serverDes, isVisible);
+  await updateSettings(serverName, serverDes, isVisible);
   res.status(200).send("Settings updated");
 });
 
-async function readDatabase(name: string): Promise<Database | null> {
-  try {
-    const data = await fs.promises.readFile(name, "utf8");
-    return JSON.parse(data);
-  } catch (e) {
-    console.error("Could not read database");
-    console.error(e);
-    return null;
-  }
-}
-
 async function usernameToMember(username: string): Promise<Member | null> {
-  let database = await readDatabase("database/users.json");
+  let database = await readDatabase(usersDatabase);
   if (!database) {
     console.error("Database not found");
     return null;
@@ -203,7 +215,7 @@ function createChat(
   chatDes: string,
   chatOwner: Account
 ): Group | void {
-  let exists = activeChats.find(chatName.toString);
+  let exists = activeChats.find((name) => name === chatName);
   if (exists) {
     return console.log("Name allready exists");
   } else {
@@ -251,8 +263,8 @@ app.post("/createChat", (req: any, res: any) => {
   return res.status(200).send(chat);
 });
 
-app.get("/getChatID", (req: any, res: any) => {
-  const database = readDatabase("database/servers.json");
+app.get("/getChatID", async (req: any, res: any) => {
+  const database = await readDatabase("database/servers.json");
   const chatID = { id: "1" };
   return res.status(200).send(chatID);
 });

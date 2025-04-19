@@ -142,10 +142,11 @@
         return newElement;
       };
 
-      channel1Button.addEventListener("click", (event) => {});
-      channel2Button.addEventListener("click", (event) => {
+      window.onload = () => {
+        channel1Button.addEventListener("click", (event) => {});
+        channel2Button.addEventListener("click", (event) => {
         openChannel(2);
-      });
+        });}
     </script>
     <script src="chat.js"></script>
   </body>

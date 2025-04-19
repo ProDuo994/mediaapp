@@ -1,4 +1,4 @@
-const server = "http://192.168.2.55:3000";
+const server = "http://192.168.68.115:3000";
 const loggedInDisplayName = localStorage.getItem("displayName");
 
 if (!loggedInDisplayName) {
@@ -6,7 +6,7 @@ if (!loggedInDisplayName) {
   window.location.href = "index.html";
 }
 let currentChatMessages;
-const chatMessagesFromServer = "";
+const chatMessagesFromServer = {};
 let ServerName = "server";
 let messageHistory = [];
 let lastAmountOfMessages = getLastMesssagesLength();
@@ -36,24 +36,18 @@ function sendMessage(sender, message, isGroup) {
       reject("Must provide all arguments");
       return;
     }
-    fetch(
-      `${server}/sendmsg?${new URLSearchParams({
-        sender: sender,
-        message: message,
-        type: isGroup,
-      }).toString()}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ sender, message }),
-      }
-    )
+    fetch(`${server}/sendmsg`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ sender, message, isGroup }),
+    })
       .then((res) => {
         if (res.status === 200) {
           resolve(res);
           console.log(res);
+          return;
         } else {
           reject("Failed to send message");
           console.warn("Failed to send message");
@@ -80,19 +74,17 @@ function createChat(name, des) {
   });
 }
 
-function getChatID(name) {
-  fetch(`${server}/getChatID`, {
+async function getChatID(name) {
+  const res = await fetch(`${server}/getChatID`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
       "X-Content-Type-Options": "nosniff",
     },
-  }).then((res) => {
-    res.json().then((json) => {
-      let chatID = json;
-      return chatID;
-    });
   });
+  if (!res.ok) return null;
+  const json = await res.json();
+  return json.id;
 }
 
 function getMessageFromServer(serverID) {
@@ -145,7 +137,9 @@ function getChannelMessageServer(name) {
       "X-Content-Type-Options": "nosniff",
     },
   }).then((res) => {
-    res.json().then((json) => (chatMessagesFromServer = res));
+    res.json().then((json) => {
+      Object.assign(chatMessagesFromServer, json);
+    });
   });
 }
 
@@ -175,11 +169,9 @@ function updateSettingsEndpoint(serverName, serverDes, isVisible, canMessage) {
 
 function createChannel(chatName, channelName) {}
 
-function pollMessages(serverID) {
+async function pollMessages(serverID) {
   fetch(
-    `${server}/getChannelMessageServer?${new URLSearchParams({
-      serverID: serverID,
-    })}`,
+    `${server}/getChannelMessageServer?${new URLSearchParams({ serverID })}`,
     {
       method: "GET",
       headers: {
@@ -188,28 +180,31 @@ function pollMessages(serverID) {
       },
     }
   )
-    .then((res) => {
-      const server1 = res["SERVER 1"];
-      const channel1Messages = server1["Channel 1"]["messages"];
-      if (channel1Messages == null) {
-        return res.status(400).send("No new messages");
+    .then((res) => res.json())
+    .then((json) => {
+      const serverData = json["SERVER 1"];
+      const channelMessages = serverData?.["Channel 1"]?.messages;
+
+      if (!channelMessages || !Array.isArray(channelMessages)) {
+        console.warn("No messages found.");
+        return;
       }
-      if (channel1Messages.length > lastAmountOfMessages) {
-        for (const message of channel1Messages) {
+
+      if (channelMessages.length > lastAmountOfMessages) {
+        for (const message of channelMessages) {
           createAndAppend(
             "p",
             messageViewBox,
-            message.username + ": " + message.message
+            `${message.username}: ${message.message}`
           );
         }
-        lastAmountOfMessages = channel1Messages.length;
+        lastAmountOfMessages = channelMessages.length;
       }
     })
     .catch((err) => {
-      console.error(err);
+      console.error("Error fetching messages:", err);
     });
-  // Save messages in current chat to server
-  saveServerData(getChatID(ServerName));
+  await getChatID(ServerName).then((chatID) => saveServerData(chatID));
 }
 
 const addChannelButton = document.getElementById("channelAdd");
@@ -334,5 +329,5 @@ function addFriend(userID) {
 window.onload = () => {
   currentChatMessages = document.getElementById("channelMessages").children;
   loadServerData(getChatID(ServerName));
-  const msgReceiveInteval = setInterval(pollMessages(0), 1000);
+  const msgReceiveInteval = setInterval(() => pollMessages(0), 3000);
 };
