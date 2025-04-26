@@ -28,6 +28,17 @@ async function readDatabase(name: string): Promise<Database | null> {
   }
 }
 
+async function writeDatabase(data: object, name: string) {
+  if (!data) return console.log("No Data found");
+  try {
+    const existing: any = await readDatabase(name);
+    await fs.promises.writeFile(`${name}_bak.json`, existing);
+    await fs.promises.writeFile(name, JSON.stringify(data));
+  } catch {
+    return console.error("Failed to write to database");
+  }
+}
+
 function binarySearch<Sortable>(
   arr: Sortable[],
   low: number,
@@ -80,7 +91,6 @@ app.post("/signup", async (req: Request, res: Response): Promise<any> => {
   if (username == null || password == null) {
     res.status(400).send("Please add all arguments");
   }
-  const database = await readDatabase(serverDatabase);
   let account: Account = {
     username,
     password,
@@ -158,17 +168,6 @@ function formatMessage(
     message,
     timesent,
   };
-}
-
-async function writeDatabase(data: object, name: string) {
-  if (!data) return console.log("No Data found");
-  try {
-    const existing: any = await readDatabase(name);
-    await fs.promises.writeFile(`${name}_bak.json`, existing);
-    await fs.promises.writeFile(name, JSON.stringify(data));
-  } catch {
-    return console.error("Failed to write to database");
-  }
 }
 
 function getOwnerOfGroup(groupName: string): Member | null {
