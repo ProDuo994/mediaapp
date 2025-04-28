@@ -51,7 +51,7 @@ function binarySearch<Sortable>(
     if (arr[mid] > toFind) return binarySearch(arr, low, mid - 1, toFind);
     return binarySearch(arr, mid + 1, high, toFind);
   }
-  return -1;
+  return null;
 }
 
 async function findUsernameByDisplayName(
@@ -183,6 +183,10 @@ function getOwnerOfGroup(groupName: string): Member | null {
   return owner;
 }
 
+function messageToString(messageObject: Message) {
+  return `${messageObject.sender}: ${messageObject.message}`;
+}
+
 app.post("/sendmsg", async (req: Request, res: Response): Promise<any> => {
   const { sender, message, isGroup } = req.body;
   if (!sender || !message) {
@@ -191,17 +195,18 @@ app.post("/sendmsg", async (req: Request, res: Response): Promise<any> => {
   }
   let database = await readDatabase(usersDatabase);
   const username = await findUsernameByDisplayName(sender);
-  console.log(database);
   if (!database?.accounts) {
     console.error("Could not find database/chatmanager:136");
     return res.status(404).send("Could not find database");
   }
-  const account: Account = binarySearch(
-    Object.values(database?.accounts || {}),
-    0,
-    Object.values(database?.accounts || {}).length,
+  if (username == undefined) {
+    return res.status(400).send("Could not find username");
+  }
+  const account: Account | void = await findAccountInDatabase(
+    usersDatabase,
     username
   );
+
   if (!account || typeof account !== "object") {
     console.error("ERROR: Could not find account in database/chatmanager:137");
     return res.status(404).send("Could not find account");
@@ -212,7 +217,14 @@ app.post("/sendmsg", async (req: Request, res: Response): Promise<any> => {
   }
 
   const fullMessage = formatMessage(account.displayName, message, Date.now());
-  console.log("[CHATMANAGER/MESSAGE]: " + fullMessage);
+  console.log(
+    "[CHATMANAGER/MESSAGE]: " +
+      messageToString(fullMessage) +
+      " @ " +
+      new Date().toLocaleDateString() +
+      " " +
+      new Date().toLocaleTimeString()
+  );
 
   if (isGroup === true) {
     return res.status(200).send("Group message received");

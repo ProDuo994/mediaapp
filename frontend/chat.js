@@ -1,4 +1,4 @@
-const server = "http://192.168.68.115:3000";
+const server = "http://192.168.2.77:3000";
 const loggedInDisplayName = localStorage.getItem("displayName");
 
 if (!loggedInDisplayName) {
@@ -76,17 +76,22 @@ function createChat(name, des) {
 }
 
 async function getChatID(name) {
-  const res = await fetch(`${server}/getChatID`, {
+  fetch(`${server}/getChatID`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
       "X-Content-Type-Options": "nosniff",
       origin: "*",
     },
-  });
-  if (!res.ok) return null;
-  const json = await res.json();
-  return json.id;
+  })
+    .then((res) => {
+      if (res.ok) {
+        return res.json.toString;
+      }
+    })
+    .catch((err) => {
+      return console.error(err);
+    });
 }
 
 function getMessageFromServer(serverID) {
