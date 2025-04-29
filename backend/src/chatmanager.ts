@@ -3,7 +3,6 @@ import cors from "cors";
 import fs, { accessSync, read } from "fs";
 import bcrypt from "bcrypt";
 import { Group, Account, Message, Database, Member } from "./types/types";
-import { send } from "process";
 const app = express();
 app.use(express.json());
 app.use(
@@ -22,7 +21,7 @@ async function readDatabase(name: string): Promise<Database | null> {
     const data = await fs.promises.readFile(name, "utf8");
     return JSON.parse(data);
   } catch (e) {
-    console.error("Could not read database");
+    console.error("Could not read database @ chatmanager:24");
     console.error(e);
     return null;
   }
@@ -35,7 +34,7 @@ async function writeDatabase(data: object, name: string) {
     await fs.promises.writeFile(`${name}_bak.json`, existing);
     await fs.promises.writeFile(name, JSON.stringify(data));
   } catch {
-    return console.error("Failed to write to database");
+    return console.error("Failed to write to database @ chatmanager:37");
   }
 }
 
@@ -96,6 +95,10 @@ app.post("/signup", async (req: Request, res: Response): Promise<any> => {
     password,
     userID: 2,
   };
+  const database = await readDatabase(usersDatabase);
+  if (database === null) {
+    return res.status(404).send("Could not find database");
+  }
   await addNewAccountToDatabase(usersDatabase, account);
   return res.status(200).send(account);
 });
@@ -195,37 +198,24 @@ app.post("/sendmsg", async (req: Request, res: Response): Promise<any> => {
   }
   let database = await readDatabase(usersDatabase);
   const username = await findUsernameByDisplayName(sender);
-  if (!database?.accounts) {
-    console.error("Could not find database/chatmanager:136");
+  if (!database?.accounts || username == undefined) {
+    console.error("Could not find the required args/chatmanager:136");
     return res.status(404).send("Could not find database");
-  }
-  if (username == undefined) {
-    return res.status(400).send("Could not find username");
   }
   const account: Account | void = await findAccountInDatabase(
     usersDatabase,
     username
   );
-
-  if (!account || typeof account !== "object") {
-    console.error("ERROR: Could not find account in database/chatmanager:137");
+  if (!account || typeof account !== "object" || !account.displayName) {
+    console.error("ERROR: Could not send message @ chatmanager:137");
     return res.status(404).send("Could not find account");
   }
-
-  if (!account.displayName) {
-    return res.status(400).send("Display name is undefined");
-  }
-
   const fullMessage = formatMessage(account.displayName, message, Date.now());
   console.log(
-    "[CHATMANAGER/MESSAGE]: " +
-      messageToString(fullMessage) +
-      " @ " +
-      new Date().toLocaleDateString() +
-      " " +
-      new Date().toLocaleTimeString()
+    `${fullMessage.sender}: ${
+      fullMessage.message
+    } @ ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`
   );
-
   if (isGroup === true) {
     return res.status(200).send("Group message received");
   } else {
@@ -233,6 +223,12 @@ app.post("/sendmsg", async (req: Request, res: Response): Promise<any> => {
     if (!database) {
       return res.status(400).send("Could not find database");
     }
+    let JSONMessage: Message = {
+      sender: fullMessage.sender,
+      message: fullMessage.message,
+      timesent: fullMessage.timesent,
+    };
+    writeDatabase(JSONMessage, serverDatabase);
     return res.status(200).send("Direct message sent");
   }
 });
@@ -361,7 +357,7 @@ app.get(
 );
 
 app.get("/server", async (req: Request, res: Response): Promise<any> => {
-  const serverID: number = req.query["serverID"];
+  const serverID: number | undefined = Number(req.query["serverID"]);
   if (!serverID) {
     return res.status(400).send("Must provide serverID");
   }
@@ -379,7 +375,7 @@ async function addNewAccountToDatabase(
   if (database === null) {
     return console.error("No Existing Data");
   }
-  database.accounts.push(newAccount);
+  database.accounts[newAccount.username] = newAccount;
   await writeDatabase(database, databaseName);
 }
 

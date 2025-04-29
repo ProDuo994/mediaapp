@@ -9,6 +9,11 @@
       "displayName": "Ben S",
       "password": "password",
       "userid": 2
+    },
+    "harrison.speechley": {
+      "displayName": "Harrison S",
+      "password": "password",
+      "userid": 3
     }
   }
 }

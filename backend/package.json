@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "set NODE_ENV=dev && tsx watch src/chatmanager.ts"
+    "dev": "cls && set NODE_ENV=dev && tsx watch src/chatmanager.ts"
   },
   "keywords": [],
   "author": "",
