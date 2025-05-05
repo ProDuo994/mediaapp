@@ -1,4 +1,4 @@
-const server = "http://192.168.68.110:3000";
+const server = "http://192.168.2.77:3000";
 const loggedInDisplayName = localStorage.getItem("displayName");
 
 if (!loggedInDisplayName) {
@@ -46,8 +46,7 @@ function sendMessage(sender, message, isGroup) {
       .then((res) => {
         if (res.status === 200) {
           resolve(res);
-          console.log(res);
-          return;
+          return console.log(res);
         } else {
           reject("Failed to send message");
           console.warn("Failed to send message");

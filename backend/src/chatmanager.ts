@@ -2,7 +2,14 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import fs, { accessSync, read } from "fs";
 import bcrypt from "bcrypt";
-import { Group, Account, Message, Database, Member } from "./types/types";
+import {
+  Group,
+  Account,
+  Message,
+  Database,
+  Member,
+  Folder,
+} from "./types/types";
 const app = express();
 app.use(express.json());
 app.use(
@@ -13,8 +20,8 @@ app.use(
 );
 const PORT: number = 3000;
 let activeChats: string[] = [];
-const serverDatabase: string = "database/servers.json";
-const usersDatabase: string = "database/users.json";
+const SERVERDATABASE: string = "database/servers.json";
+const USERSDATABASE: string = "database/users.json";
 
 async function readDatabase(name: string): Promise<Database | null> {
   try {
@@ -31,7 +38,7 @@ async function writeDatabase(data: object, name: string) {
   if (!data) return console.log("No Data found");
   try {
     const existing: any = await readDatabase(name);
-    await fs.promises.writeFile(`${name}_bak.json`, existing);
+    await fs.promises.writeFile(`${name}_bak.json`, JSON.stringify(existing));
     await fs.promises.writeFile(name, JSON.stringify(data));
   } catch {
     return console.error("Failed to write to database @ chatmanager:37");
@@ -56,7 +63,7 @@ function binarySearch<Sortable>(
 async function findUsernameByDisplayName(
   displayName: string
 ): Promise<string | null> {
-  const database = await readDatabase(usersDatabase);
+  const database = await readDatabase(USERSDATABASE);
   if (!database) {
     console.error("Could not read database");
     return null;
@@ -95,11 +102,11 @@ app.post("/signup", async (req: Request, res: Response): Promise<any> => {
     password,
     userID: 2,
   };
-  const database = await readDatabase(usersDatabase);
+  const database = await readDatabase(USERSDATABASE);
   if (database === null) {
     return res.status(404).send("Could not find database");
   }
-  await addNewAccountToDatabase(usersDatabase, account);
+  await addNewAccountToDatabase(USERSDATABASE, account);
   return res.status(200).send(account);
 });
 
@@ -107,7 +114,7 @@ app.post("/login", async (req: Request, res: Response): Promise<any> => {
   let username = req.body.username;
   let password = req.body.password;
   let account: Account | void | undefined = await findAccountInDatabase(
-    usersDatabase,
+    USERSDATABASE,
     username
   );
   if (account === undefined) {
@@ -133,7 +140,7 @@ app.post("/addFreind", async (req: Request, res: Response): Promise<any> => {
   if (username == null || friendName == null) {
     return res.status(400).send("Please add all arguments");
   }
-  const database = await readDatabase(usersDatabase);
+  const database = await readDatabase(USERSDATABASE);
   if (database === null) {
     return res.status(404).send("Could not find database");
   }
@@ -151,7 +158,7 @@ app.post("createChannel", async (req: Request, res: Response): Promise<any> => {
   if (channelName == null || channelDes == null || channelOwner == null) {
     return res.status(400).send("Please add all arguments");
   }
-  const database = await readDatabase(usersDatabase);
+  const database = await readDatabase(USERSDATABASE);
   if (database === null) {
     return res.status(404).send("Could not find database");
   }
@@ -196,14 +203,14 @@ app.post("/sendmsg", async (req: Request, res: Response): Promise<any> => {
     console.error("All args not provided");
     return res.status(400).send("All args not provided");
   }
-  let database = await readDatabase(usersDatabase);
+  let database = await readDatabase(USERSDATABASE);
   const username = await findUsernameByDisplayName(sender);
   if (!database?.accounts || username == undefined) {
     console.error("Could not find the required args/chatmanager:136");
     return res.status(404).send("Could not find database");
   }
   const account: Account | void = await findAccountInDatabase(
-    usersDatabase,
+    USERSDATABASE,
     username
   );
   if (!account || typeof account !== "object" || !account.displayName) {
@@ -228,7 +235,7 @@ app.post("/sendmsg", async (req: Request, res: Response): Promise<any> => {
       message: fullMessage.message,
       timesent: fullMessage.timesent,
     };
-    writeDatabase(JSONMessage, serverDatabase);
+    writeDatabase(JSONMessage, SERVERDATABASE);
     return res.status(200).send("Direct message sent");
   }
 });
@@ -266,7 +273,7 @@ app.post("/updateSettings", async (req: Request, res: Response) => {
 });
 
 async function usernameToMember(username: string): Promise<Member | null> {
-  let database = await readDatabase(usersDatabase);
+  let database = await readDatabase(USERSDATABASE);
   if (!database) {
     console.error("Database not found");
     return null;
@@ -284,11 +291,15 @@ async function usernameToMember(username: string): Promise<Member | null> {
   return member;
 }
 
-function createChat(
+async function createFolder(folderName: string, dir: string) {
+  await fs.promises.mkdir(`${dir}/${folderName}`);
+}
+
+async function createChat(
   chatName: string,
   chatDes: string,
   chatOwner: Account
-): Group | void {
+): Promise<Group | void> {
   let exists = activeChats.find((name) => name === chatName);
   if (exists) {
     return console.log("Name allready exists");
@@ -301,6 +312,11 @@ function createChat(
       isPublic: false,
       id: 0,
     };
+    const serverFolder = createFolder(newChat.groupName, "backend/database");
+    await fs.promises.writeFile(
+      `backend/database/${newChat.groupName}/members.json`,
+      JSON.stringify(newChat.members)
+    );
     return newChat;
   }
 }
@@ -345,7 +361,10 @@ app.get("/getChatID", async (req: Request, res: Response): Promise<any> => {
 app.get(
   "/getChannelMessageServer",
   async (req: Request, res: Response): Promise<any> => {
-    const database = await readDatabase("database/servers.json");
+    const serverID = req.query["serverID"];
+    const database: Database | null = await readDatabase(
+      "database/servers.json"
+    );
     if (!database) {
       return res.status(404).send("Could not find json database");
     }

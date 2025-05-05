@@ -40,3 +40,7 @@ export interface Database {
   };
   messages?: any;
 }
+
+export interface Folder {
+  files: {};
+}
