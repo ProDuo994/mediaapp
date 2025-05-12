@@ -28,7 +28,6 @@ async function readDatabase(name: string): Promise<Database | null> {
     const data = await fs.promises.readFile(name, "utf8");
     return JSON.parse(data);
   } catch (e) {
-    console.error("Could not read database @ chatmanager:24");
     console.error(e);
     return null;
   }
@@ -41,7 +40,7 @@ async function writeDatabase(data: object, name: string) {
     await fs.promises.writeFile(`${name}_bak.json`, JSON.stringify(existing));
     await fs.promises.writeFile(name, JSON.stringify(data));
   } catch {
-    return console.error("Failed to write to database @ chatmanager:37");
+    return console.error("Failed to write to database @ chatmanager:39");
   }
 }
 
@@ -144,7 +143,7 @@ app.post("/addFreind", async (req: Request, res: Response): Promise<any> => {
   if (database === null) {
     return res.status(404).send("Could not find database");
   }
-  let account: Account | void = database.accounts[username];
+  const account: Account | void = database.accounts[username];
   if (account === undefined) {
     return res.status(404).send("Could not find account");
   }
@@ -162,7 +161,7 @@ app.post("createChannel", async (req: Request, res: Response): Promise<any> => {
   if (database === null) {
     return res.status(404).send("Could not find database");
   }
-  let account: Account | void = database.accounts[channelOwner];
+  const account: Account | void = database.accounts[channelOwner];
   if (account === undefined) {
     return res.status(404).send("Could not find account");
   }
@@ -369,6 +368,7 @@ app.get(
       return res.status(404).send("Could not find json database");
     }
     let messages = database.messages;
+    console.log(messages);
     if (messages) {
       return res.status(200).send(messages);
     }

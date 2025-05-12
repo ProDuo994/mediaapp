@@ -9,10 +9,12 @@ let currentChatMessages;
 const chatMessagesFromServer = {};
 let ServerName = "server";
 let messageHistory = [];
+
 function getLastMessagesLength() {
   const amount = messageHistory.length;
   return amount;
 }
+
 let lastAmountOfMessages = getLastMessagesLength();
 
 function getServer(serverID) {
@@ -48,8 +50,7 @@ function sendMessage(sender, message, isGroup) {
           resolve(res);
           return console.log(res);
         } else {
-          reject("Failed to send message");
-          console.warn("Failed to send message");
+          return reject("Failed to send message");
         }
       })
       .catch((err) => {
@@ -194,6 +195,9 @@ function createChannel(chatName, channelName) {
 }
 
 async function pollMessages(serverID) {
+  console.log(
+    `${server}/getChannelMessageServer?${new URLSearchParams({ serverID })}`
+  );
   fetch(
     `${server}/getChannelMessageServer?${new URLSearchParams({ serverID })}`,
     {
@@ -204,10 +208,16 @@ async function pollMessages(serverID) {
       },
     }
   )
-    .then((res) => res.json())
+    .then((res) => {
+      console.log(res);
+      res.json();
+    })
     .then((json) => {
+      console.log(json);
       const serverData = json["SERVER 1"];
+      console.log(serverData);
       const channelMessages = serverData?.["Channel 1"]?.messages;
+      console.log(channelMessages);
 
       if (!channelMessages || !Array.isArray(channelMessages)) {
         console.warn("No messages found.");
