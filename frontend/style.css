@@ -49,7 +49,7 @@ body {
 
 .navigation li a {
   padding: 14px 16px;
-  font-size: 50;
+  font-size: 50px;
   text-decoration: none;
   color: black;
   display: block;
@@ -84,7 +84,11 @@ body {
   background-color: blueviolet;
   font-family: monospace;
   align-items: center;
-  height: 45px;
+  height: 41px;
+  box-shadow: rgba(58, 24, 209, 0.7) 0px -1px 0px 0px inset;
+  box-sizing: border-box;
+  unicode-bidi: isolate;
+  line-height: 21px;
 }
 
 .menuButton {
@@ -117,10 +121,11 @@ body {
 
 .channelList {
   height: 100%;
-  width: 150px;
+  width: 115px;
   background-color: rgb(63, 109, 110);
   display: flex;
   flex-direction: column;
+  text-align: center;
 }
 
 .channelList a {
@@ -146,6 +151,7 @@ body {
   height: 89%;
   overflow-y: auto;
   overflow-x: hidden;
+  scroll-behavior: smooth;
 }
 
 .messageBox {
@@ -171,6 +177,7 @@ body {
   width: 150px;
   height: 25px;
   padding-bottom: 3px;
+  position: relative;
 }
 
 .account:hover {
@@ -193,6 +200,7 @@ body {
 .accountPage {
   display: none;
   position: absolute;
+  top: 100%;
   background-color: blueviolet;
   width: 200px;
   right: 150px;
@@ -262,6 +270,28 @@ dialog {
   border: none;
   border-radius: 8px;
   padding: 20px;
+  align-self: center;
+  max-width: 90%;
+  width: 210px;
+}
+
+#serverList {
+  list-style-type: none;
+  padding-left: 0;
+  background-color: rgb(39, 80, 82);
+  height: 100%;
+  padding-right: 5px;
+  text-align: center;
+}
+
+#serverList li:hover {
+  color: lightblue;
+  cursor: pointer;
+}
+
+.messageButtons {
+  background-color: aqua;
+  border-radius: 30%;
 }
 
 @media screen and (max-width: 600px) {
@@ -274,6 +304,8 @@ dialog {
   }
 
   .memberList {
+    margin-left: auto;
+    justify-content: space-between;
     width: 150px;
   }
 }

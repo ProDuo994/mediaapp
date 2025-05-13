@@ -24,6 +24,7 @@ export interface Account {
   username: string;
   password: string;
   userID: number;
+  displayName?: string;
 }
 
 export interface Permissions {
@@ -34,7 +35,12 @@ export interface Permissions {
 }
 
 export interface Database {
-  accounts: Record<string, Account>;
-  messages: Message[];
-  groups: Group[];
+  accounts: {
+    [username: string]: Account;
+  };
+  messages?: any;
+}
+
+export interface Folder {
+  files: {};
 }

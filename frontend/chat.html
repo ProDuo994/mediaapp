@@ -17,13 +17,21 @@
         <form id="newChannelDialogForm">
           <h2>New Channel</h2>
           <h5>Channel Name:</h5>
-          <input name="name" />
+          <input name="name" id="serverName">
           <button type="submit">Add</button>
           <button type="button" class="closeChannelDialog" id="closeChannelDialog">
             Close
           </button>
         </form>
       </div>
+    </dialog>
+    <dialog class="uploadImageGUI" id="uploadImageGUI">
+      <input type="file" name="File:" id="" accept=".jpeg, .jpg, .png, .svg, .gif">
+      <button id="closeUploadGui">Close</button>
+      <img src=""/>
+    </dialog>
+    <dialog>
+      <h5>Voice Recording</h5>
     </dialog>
     <dialog class="channelSettingsGUI" id="channelSettingsGUI">
       <form>
@@ -65,6 +73,11 @@
       <h1 class="servername" id="servername">Server Name</h1>
     </div>
     <div class="mainDisplay">
+      <aside class="serverListContainer">
+        <ul id="serverList">
+          <h2>Servers</h2>
+        </ul>
+      </aside>
       <div class="channelList">
         <h2 class="panelheader">Channels</h2>
         <br />
@@ -84,7 +97,9 @@
           <h3></h3>
         </div>
         <div class="messageBox">
-          <input autocomplete="false" type="text" id="messageBoxInput" />
+          <button id="sendImaageButton" class="messageButtons">Image</button>
+          <button id="sendVoiceButton" class="messageButtons">Voice</button>
+          <input autocapitalize="false" autocomplete="false" type="text" id="messageBoxInput" spellcheck="false"/>
         </div>
       </div>
       <div class="memberList">
@@ -115,7 +130,6 @@
       </div>
     </div>
     <script>
-      const messageBoxInput = document.getElementById("messageBoxInput");
       const messageViewBox = document.getElementById("channelMessages");
       const channel1Button = document.getElementById("channel1");
       const channel2Button = document.getElementById("channel2");
@@ -127,10 +141,11 @@
         return newElement;
       };
 
-      channel1Button.addEventListener("click", (event) => {});
-      channel2Button.addEventListener("click", (event) => {
+      window.onload = () => {
+        channel1Button.addEventListener("click", (event) => {});
+        channel2Button.addEventListener("click", (event) => {
         openChannel(2);
-      });
+        });}
     </script>
     <script src="chat.js"></script>
   </body>
