@@ -25,8 +25,8 @@ const USERSDATABASE: string = "database/users.json";
 
 async function readDatabase(name: string): Promise<Database | null> {
   try {
-    const data = await fs.promises.readFile(name, "utf8");
-    return JSON.parse(data);
+    const d = await fs.promises.readFile(name, "utf8");
+    return JSON.parse(d);
   } catch (e) {
     console.error(e);
     return null;
@@ -36,8 +36,8 @@ async function readDatabase(name: string): Promise<Database | null> {
 async function writeDatabase(data: object, name: string) {
   if (!data) return console.log("No Data found");
   try {
-    const existing: any = await readDatabase(name);
-    await fs.promises.writeFile(`${name}_bak.json`, JSON.stringify(existing));
+    const e: any = await readDatabase(name);
+    await fs.promises.writeFile(`${name}_bak.json`, JSON.stringify(e));
     await fs.promises.writeFile(name, JSON.stringify(data));
   } catch {
     return console.error("Failed to write to database @ chatmanager:39");
@@ -110,40 +110,37 @@ app.post("/signup", async (req: Request, res: Response): Promise<any> => {
 });
 
 app.post("/login", async (req: Request, res: Response): Promise<any> => {
-  let username = req.body.username;
-  let password = req.body.password;
-  let account: Account | void | undefined = await findAccountInDatabase(
-    USERSDATABASE,
-    username
-  );
-  if (account === undefined) {
+  let usr = req.body.username;
+  let psw = req.body.password;
+  let acc: Account | void = await findAccountInDatabase(USERSDATABASE, usr);
+  if (acc === undefined) {
     return res.status(400).send("Could not find account");
   }
-  if (password === account.password) {
+  if (psw === acc.password) {
     console.log(
-      username +
+      usr +
         " logged in at " +
         new Date().toLocaleDateString() +
         " " +
         new Date().toLocaleTimeString()
     );
-    return res.status(200).send(account);
+    return res.status(200).send(acc);
   } else {
     return res.status(401).send("Incorrect Username/Password");
   }
 });
 
 app.post("/addFreind", async (req: Request, res: Response): Promise<any> => {
-  let username = req.body.username;
+  let usr = req.body.username;
   let friendName = req.body.friendName;
-  if (username == null || friendName == null) {
+  if (usr == null || friendName == null) {
     return res.status(400).send("Please add all arguments");
   }
   const database = await readDatabase(USERSDATABASE);
   if (database === null) {
     return res.status(404).send("Could not find database");
   }
-  const account: Account | void = database.accounts[username];
+  const account: Account | void = database.accounts[usr];
   if (account === undefined) {
     return res.status(404).send("Could not find account");
   }
@@ -151,17 +148,17 @@ app.post("/addFreind", async (req: Request, res: Response): Promise<any> => {
 });
 
 app.post("createChannel", async (req: Request, res: Response): Promise<any> => {
-  let channelName = req.body.channelName;
-  let channelDes = req.body.channelDes;
-  let channelOwner = req.body.channelOwner;
-  if (channelName == null || channelDes == null || channelOwner == null) {
+  let cName = req.body.channelName;
+  let cDes = req.body.channelDes;
+  let cOwner = req.body.channelOwner;
+  if (cName == null || cDes == null || cOwner == null) {
     return res.status(400).send("Please add all arguments");
   }
   const database = await readDatabase(USERSDATABASE);
   if (database === null) {
     return res.status(404).send("Could not find database");
   }
-  const account: Account | void = database.accounts[channelOwner];
+  const account: Account | void = database.accounts[cOwner];
   if (account === undefined) {
     return res.status(404).send("Could not find account");
   }
