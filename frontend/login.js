@@ -1,4 +1,4 @@
-const server = "http://172.23.64.1:3000";
+const server = "http://10.221.208.185:3000";
 let loginButton;
 
 function processLogin(displayName, sessionToken) {
