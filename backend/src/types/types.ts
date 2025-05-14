@@ -39,6 +39,13 @@ export interface Database {
     [username: string]: Account;
   };
   messages?: any;
+  servers: {
+    [serverName: string]: {
+      serverID: number;
+      members: Member[];
+      groups: Group[];
+    };
+  }
 }
 
 export interface Folder {

@@ -20,8 +20,6 @@ app.use(
 );
 const PORT: number = 3000;
 let activeChats: string[] = [];
-const SERVERDATABASE: string = "database/servers.json";
-const USERSDATABASE: string = "database/users.json";
 
 async function readDatabase(name: string): Promise<Database | null> {
   try {
@@ -32,6 +30,22 @@ async function readDatabase(name: string): Promise<Database | null> {
     return null;
   }
 }
+
+let SERVERDATABASE: Database;
+let USERSDATABASE: Database;
+
+(async () => {
+  const userData = await readDatabase("database/users.json");
+  if (!userData) {
+    throw new Error("Failed to load user database");
+  }
+  USERSDATABASE = userData;
+  const serverData = await readDatabase("database/servers.json");
+  if (!serverData) {
+    throw new Error("Failed to load server database");
+  }
+  SERVERDATABASE = serverData;
+})();
 
 async function writeDatabase(data: object, name: string) {
   if (!data) return console.log("No Data found");
@@ -62,13 +76,12 @@ function binarySearch<Sortable>(
 async function findUsernameByDisplayName(
   displayName: string
 ): Promise<string | null> {
-  const database = await readDatabase(USERSDATABASE);
-  if (!database) {
+  if (!USERSDATABASE) {
     console.error("Could not read database");
     return null;
   }
-  for (const username in database.accounts) {
-    if (database.accounts[username].displayName === displayName) {
+  for (const username in USERSDATABASE.accounts) {
+    if (USERSDATABASE.accounts[username].displayName === displayName) {
       return username;
     }
   }
@@ -101,18 +114,17 @@ app.post("/signup", async (req: Request, res: Response): Promise<any> => {
     password,
     userID: 2,
   };
-  const database = await readDatabase(USERSDATABASE);
-  if (database === null) {
+  if (USERSDATABASE === null) {
     return res.status(404).send("Could not find database");
   }
-  await addNewAccountToDatabase(USERSDATABASE, account);
+  await addNewAccountToDatabase("database/users.json", account);
   return res.status(200).send(account);
 });
 
 app.post("/login", async (req: Request, res: Response): Promise<any> => {
   let usr = req.body.username;
   let psw = req.body.password;
-  let acc: Account | void = await findAccountInDatabase(USERSDATABASE, usr);
+  let acc: Account | void = await findAccountInDatabase("database/users.json", usr);
   if (acc === undefined) {
     return res.status(400).send("Could not find account");
   }
@@ -136,11 +148,7 @@ app.post("/addFreind", async (req: Request, res: Response): Promise<any> => {
   if (usr == null || friendName == null) {
     return res.status(400).send("Please add all arguments");
   }
-  const database = await readDatabase(USERSDATABASE);
-  if (database === null) {
-    return res.status(404).send("Could not find database");
-  }
-  const account: Account | void = database.accounts[usr];
+  const account: Account | void = USERSDATABASE.accounts[usr];
   if (account === undefined) {
     return res.status(404).send("Could not find account");
   }
@@ -154,11 +162,7 @@ app.post("createChannel", async (req: Request, res: Response): Promise<any> => {
   if (cName == null || cDes == null || cOwner == null) {
     return res.status(400).send("Please add all arguments");
   }
-  const database = await readDatabase(USERSDATABASE);
-  if (database === null) {
-    return res.status(404).send("Could not find database");
-  }
-  const account: Account | void = database.accounts[cOwner];
+  const account: Account | void = USERSDATABASE.accounts[cOwner];
   if (account === undefined) {
     return res.status(404).send("Could not find account");
   }
@@ -199,14 +203,13 @@ app.post("/sendmsg", async (req: Request, res: Response): Promise<any> => {
     console.error("All args not provided");
     return res.status(400).send("All args not provided");
   }
-  let database = await readDatabase(USERSDATABASE);
   const username = await findUsernameByDisplayName(sender);
-  if (!database?.accounts || username == undefined) {
+  if (!USERSDATABASE.accounts || username == undefined) {
     console.error("Could not find the required args/chatmanager:136");
     return res.status(404).send("Could not find database");
   }
   const account: Account | void = await findAccountInDatabase(
-    USERSDATABASE,
+    "database/users.json",
     username
   );
   if (!account || typeof account !== "object" || !account.displayName) {
@@ -231,7 +234,7 @@ app.post("/sendmsg", async (req: Request, res: Response): Promise<any> => {
       message: fullMessage.message,
       timesent: fullMessage.timesent,
     };
-    writeDatabase(JSONMessage, SERVERDATABASE);
+    writeDatabase(JSONMessage, "database/users.json");
     return res.status(200).send("Direct message sent");
   }
 });
@@ -269,12 +272,7 @@ app.post("/updateSettings", async (req: Request, res: Response) => {
 });
 
 async function usernameToMember(username: string): Promise<Member | null> {
-  let database = await readDatabase(USERSDATABASE);
-  if (!database) {
-    console.error("Database not found");
-    return null;
-  }
-  let usernameInDatabase = database.accounts[username];
+  let usernameInDatabase = USERSDATABASE.accounts[username];
   if (usernameInDatabase == undefined) {
     return null;
   }
@@ -317,12 +315,12 @@ async function createChat(
   }
 }
 
-async function getServerMemberUsernames(serverID: number): Promise<string> {
-  let database = await readDatabase("database/servers.json");
-  let members = {
-    Ben: "Ben",
-    Admin: "Admin",
-  };
+async function getServerMemberUsernames(serverID: number): Promise<string | null>{;
+  const members = USERSDATABASE.servers[serverID]?.members;
+  if (!members) {
+    console.error("Members not found for the given server ID");
+    return null;
+  }
   return members.toString();
 }
 
@@ -331,6 +329,9 @@ async function getServerData(serverID: number): Promise<string | void> {
     return console.error("Must provide serverID");
   }
   let data = await getServerMemberUsernames(serverID);
+  if (data == null){
+    throw new Error("Could not find server data");
+  }
   return data;
 }
 
