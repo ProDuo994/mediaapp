@@ -199,12 +199,12 @@ function messageToString(messageObject: Message) {
 
 app.post("/sendmsg", async (req: Request, res: Response): Promise<any> => {
   const { sender, message, isGroup } = req.body;
-  if (!sender || !message) {
+  if (!sender || !message || !isGroup) {
     console.error("All args not provided");
     return res.status(400).send("All args not provided");
   }
   const username = await findUsernameByDisplayName(sender);
-  if (!USERSDATABASE.accounts || username == undefined) {
+  if (username == undefined) {
     console.error("Could not find the required args/chatmanager:136");
     return res.status(404).send("Could not find database");
   }
@@ -244,11 +244,6 @@ async function updateSettings(
   serverDes: string,
   isVisible: boolean
 ) {
-  let database = await readDatabase("database/servers.json");
-  if (database == undefined) {
-    console.error("Could not find database");
-    return false;
-  }
   let groupMembers: Member[] = [];
   let groupToUpdate: Group = {
     groupName: oldServerName,
@@ -337,14 +332,14 @@ async function getServerData(serverID: number): Promise<string | void> {
   return data;
 }
 
-app.post("/createChat", (req: any, res: any) => {
+app.post("/createChat", async (req: any, res: any) => {
   let chatName = req.query["chatName"];
   let chatDescription = req.query["chatDes"];
   let chatOwner = req.query["chatOwner"];
   if (!chatName || !chatDescription || !chatOwner) {
     return res.status(400).send("Chat name or chat description not provided.");
   }
-  let chat = createChat(
+  let chat = await createChat(
     chatName as string,
     chatDescription as string,
     chatOwner as unknown as Account
@@ -353,11 +348,13 @@ app.post("/createChat", (req: any, res: any) => {
 });
 
 app.get("/getChatID", async (req: Request, res: Response): Promise<any> => {
-  const chatID = { id: "1" };
+  const chatName = req.body.chatName;
+  const chatID = USERSDATABASE.servers[chatName].serverID;
   return res.status(200).send(chatID);
 });
+
 app.get(
-  "/getChannelMessageServer",
+  `/getChannelMessageServer`,
   async (req: Request, res: Response): Promise<any> => {
     const serverID = req.query["serverID"];
     const database: Database | null = await readDatabase(
@@ -384,6 +381,7 @@ app.get("/server", async (req: Request, res: Response): Promise<any> => {
 });
 
 app.get("/test", async (req: Request, res: Response): Promise<any> => {
+  // Used to test if the server is running
   return res.status(200);
 });
 
@@ -392,6 +390,7 @@ async function addNewAccountToDatabase(
   newAccount: Account
 ) {
   if (databaseName == null) {
+    return console.error("Database name not provided");
   }
   const database = await readDatabase(databaseName);
   if (database === null) {
@@ -430,10 +429,11 @@ app.get("/getChatMessages", async (req: Request, res: any) => {
   if (serverID == undefined) {
     return res.status(400).send("Must provide server ID");
   }
+  const serverIDStr = Array.isArray(serverID) ? serverID[0] : serverID;
   if (SERVERDATABASE.messages == undefined) {
     return res.status(404).send("Could not find messages");
   }
-  return res.status(200).send(SERVERDATABASE.messages);
+  return res.status(200).send(SERVERDATABASE.servers[String(serverIDStr)].messages);
 });
 app.listen(PORT, () => {
   console.log(`Mediapp listening on port ${PORT}.`);
