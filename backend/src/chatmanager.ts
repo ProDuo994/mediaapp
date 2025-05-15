@@ -36,14 +36,11 @@ let USERSDATABASE: Database;
 
 (async () => {
   const userData = await readDatabase("database/users.json");
-  if (!userData) {
+  const serverData = await readDatabase("database/servers.json");
+  if (!userData || !serverData) {
     throw new Error("Failed to load user database");
   }
   USERSDATABASE = userData;
-  const serverData = await readDatabase("database/servers.json");
-  if (!serverData) {
-    throw new Error("Failed to load server database");
-  }
   SERVERDATABASE = serverData;
 })();
 
@@ -124,7 +121,10 @@ app.post("/signup", async (req: Request, res: Response): Promise<any> => {
 app.post("/login", async (req: Request, res: Response): Promise<any> => {
   let usr = req.body.username;
   let psw = req.body.password;
-  let acc: Account | void = await findAccountInDatabase("database/users.json", usr);
+  let acc: Account | void = await findAccountInDatabase(
+    "database/users.json",
+    usr
+  );
   if (acc === undefined) {
     return res.status(400).send("Could not find account");
   }
@@ -315,7 +315,9 @@ async function createChat(
   }
 }
 
-async function getServerMemberUsernames(serverID: number): Promise<string | null>{;
+async function getServerMemberUsernames(
+  serverID: number
+): Promise<string | null> {
   const members = USERSDATABASE.servers[serverID]?.members;
   if (!members) {
     console.error("Members not found for the given server ID");
@@ -329,7 +331,7 @@ async function getServerData(serverID: number): Promise<string | void> {
     return console.error("Must provide serverID");
   }
   let data = await getServerMemberUsernames(serverID);
-  if (data == null){
+  if (data == null) {
     throw new Error("Could not find server data");
   }
   return data;
@@ -351,7 +353,6 @@ app.post("/createChat", (req: any, res: any) => {
 });
 
 app.get("/getChatID", async (req: Request, res: Response): Promise<any> => {
-  const database = await readDatabase("database/servers.json");
   const chatID = { id: "1" };
   return res.status(200).send(chatID);
 });
@@ -380,6 +381,10 @@ app.get("/server", async (req: Request, res: Response): Promise<any> => {
   }
   const serverData = await getServerData(serverID);
   return res.status(200).send(serverData);
+});
+
+app.get("/test", async (req: Request, res: Response): Promise<any> => {
+  return res.status(200);
 });
 
 async function addNewAccountToDatabase(
@@ -425,16 +430,11 @@ app.get("/getChatMessages", async (req: Request, res: any) => {
   if (serverID == undefined) {
     return res.status(400).send("Must provide server ID");
   }
-  const database = await readDatabase("database/servers.json");
-  if (!database) {
-    return res.status(500);
-  }
-  if (database.messages == undefined) {
+  if (SERVERDATABASE.messages == undefined) {
     return res.status(404).send("Could not find messages");
   }
-  return res.status(200).send(database.messages);
+  return res.status(200).send(SERVERDATABASE.messages);
 });
-
 app.listen(PORT, () => {
   console.log(`Mediapp listening on port ${PORT}.`);
 });

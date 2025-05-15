@@ -41,7 +41,27 @@ function login(username, password) {
     .catch((err) => console.error(err));
 }
 
+function isServerOnline() {
+  fetch(`${server}/test`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Content-Type-Options": "nosniff",
+    },
+  })
+    .then((res) => {
+      if (res.ok) {
+        return true;
+      } else {
+
+      }
+    }) 
+    .catch(() => {return false;})}
+
 window.onload = () => {
+  if (!isServerOnline()) {
+    return window.alert("Server is not reachable. Please try again later.");
+  }
   const loginForm = document.getElementById("loginForm");
   loginButton = document.getElementById("loginBtn");
 
