@@ -74,8 +74,7 @@ async function findUsernameByDisplayName(
   displayName: string
 ): Promise<string | null> {
   if (!USERSDATABASE) {
-    console.error("Could not read database");
-    return null;
+    return console.error("Could not read database");
   }
   for (const username in USERSDATABASE.accounts) {
     if (USERSDATABASE.accounts[username].displayName === displayName) {
@@ -208,15 +207,15 @@ app.post("/sendmsg", async (req: Request, res: Response): Promise<any> => {
     console.error("Could not find the required args/chatmanager:136");
     return res.status(404).send("Could not find database");
   }
-  const account: Account | void = await findAccountInDatabase(
+  const acc: Account | void = await findAccountInDatabase(
     "database/users.json",
     username
   );
-  if (!account || typeof account !== "object" || !account.displayName) {
+  if (!acc || typeof acc !== "object" || !acc.displayName) {
     console.error("ERROR: Could not send message @ chatmanager:137");
     return res.status(404).send("Could not find account");
   }
-  const fullMessage = formatMessage(account.displayName, message, Date.now());
+  const fullMessage = formatMessage(acc.displayName, message, Date.now());
   console.log(
     `${fullMessage.sender}: ${
       fullMessage.message
@@ -225,16 +224,12 @@ app.post("/sendmsg", async (req: Request, res: Response): Promise<any> => {
   if (isGroup === true) {
     return res.status(200).send("Group message received");
   } else {
-    const database = await readDatabase("database/servers.json");
-    if (!database) {
-      return res.status(400).send("Could not find database");
-    }
-    let JSONMessage: Message = {
+    let JSONMsg: Message = {
       sender: fullMessage.sender,
       message: fullMessage.message,
       timesent: fullMessage.timesent,
     };
-    writeDatabase(JSONMessage, "database/users.json");
+    writeDatabase(JSONMsg, "database/users.json");
     return res.status(200).send("Direct message sent");
   }
 });
@@ -380,7 +375,7 @@ app.get("/server", async (req: Request, res: Response): Promise<any> => {
   return res.status(200).send(serverData);
 });
 
-app.get("/test", async (req: Request, res: Response): Promise<any> => {
+app.get("/test", (req: Request, res: Response) => {
   // Used to test if the server is running
   return res.status(200);
 });
