@@ -1,32 +1,26 @@
-const server = "http://10.221.208.185:3000";
+const server = "http://127.0.0.1:3000";
 let loginButton;
 
 function processLogin(displayName, sessionToken) {
   localStorage.setItem("displayName", displayName);
   localStorage.setItem("sessionToken", sessionToken);
-  window.location.href = "chat.html";
+  window.location.href = `${server}/frontend/chat.html`;
 }
 
 function login(username, password) {
   console.log(`Running login: fetching ${server}/login`);
   loginButton.disabled = true;
-  fetch(
-    `${server}/login?${new URLSearchParams({
+  fetch(`${server}/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Content-Type-Options": "nosniff",
+    },
+    body: JSON.stringify({
       username,
       password,
-    })}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Content-Type-Options": "nosniff",
-      },
-      body: JSON.stringify({
-        username,
-        password,
-      }),
-    }
-  )
+    }),
+  })
     .then((res) => {
       console.log("received response");
       if (res.ok) {
@@ -53,18 +47,19 @@ function isServerOnline() {
       if (res.ok) {
         return true;
       } else {
-
       }
-    }) 
-    .catch(() => {return false;})}
+    })
+    .catch(() => {
+      return false;
+    });
+}
 
 window.onload = () => {
-  if (!isServerOnline()) {
-    return window.alert("Server is not reachable. Please try again later.");
-  }
   const loginForm = document.getElementById("loginForm");
   loginButton = document.getElementById("loginBtn");
-
+  if (isServerOnline() === false) {
+    return window.alert("Server is not reachable. Please try again later.");
+  }
   loginForm.addEventListener("submit", (event) => {
     event.preventDefault();
     login(

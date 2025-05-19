@@ -1,4 +1,4 @@
-const server = "http://10.221.208.185:3000";
+const server = "http://127.0.0.1:3000"; // localhost (do not change)
 const loggedInDisplayName = localStorage.getItem("displayName");
 
 if (!loggedInDisplayName) {

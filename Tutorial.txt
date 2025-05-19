@@ -1,0 +1,7 @@
+PASSWORD = posttgres
+
+Dump Database(Use in backend): pg_dump -U postgres -W postgres mediapp > ./backend/database/db_backup.sql
+
+Restore Database: psql -U postgres -W postgres -X mediapp < ./backend/database/db_backup.sql
+
+Create Row in Users Table: INSERT INTO users (displayName, username, password) VALUES ('displayName', 'username', 'password')
