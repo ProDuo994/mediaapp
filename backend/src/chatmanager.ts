@@ -156,7 +156,7 @@ app.post("/addFreind", async (req: Request, res: Response): Promise<any> => {
   return res.status(200).send(account);
 });
 
-app.post("createChannel", async (req: Request, res: Response): Promise<any> => {
+app.post("/createChannel", async (req: Request, res: Response): Promise<any> => {
   let cName = req.body.channelName;
   let cDes = req.body.channelDes;
   let cOwner = req.body.channelOwner;
@@ -329,19 +329,24 @@ async function getServerData(serverID: number): Promise<string | void> {
   return data;
 }
 
-app.post("/createChat", async (req: any, res: any) => {
-  let chatName = req.query["chatName"];
-  let chatDescription = req.query["chatDes"];
-  let chatOwner = req.query["chatOwner"];
-  if (!chatName || !chatDescription || !chatOwner) {
-    return res.status(400).send("Chat name or chat description not provided.");
+app.post("/createChat", async (req: Request, res: Response) => {
+  try {
+    let chatName = req.query["chatName"];
+    let chatDescription = req.query["chatDes"];
+    let chatOwner = req.query["chatOwner"];
+    if (!chatName || !chatDescription || !chatOwner) {
+      return res.status(400).send("Chat name or chat description not provided.");
+    }
+    let chat = await createChat(
+      chatName as string,
+      chatDescription as string,
+      chatOwner as unknown as Account
+    );
+    return res.status(200).send(chat);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send("Internal server error");
   }
-  let chat = await createChat(
-    chatName as string,
-    chatDescription as string,
-    chatOwner as unknown as Account
-  );
-  return res.status(200).send(chat);
 });
 
 app.get("/getChatID", async (req: Request, res: Response): Promise<any> => {
@@ -427,6 +432,8 @@ app.get("/getChatMessages", async (req: Request, res: any) => {
     return res.status(400).send("Must provide server ID");
   }
   const serverIDStr = Array.isArray(serverID) ? serverID[0] : serverID;
+  console.log("SERVERDATABASE", SERVERDATABASE.servers);
+  console.log("Requested serverID:", serverIDStr);
   if (SERVERDATABASE.messages == undefined) {
     return res.status(404).send("Could not find messages");
   }
@@ -434,6 +441,20 @@ app.get("/getChatMessages", async (req: Request, res: any) => {
     .status(200)
     .send(SERVERDATABASE.servers[String(serverIDStr)].messages);
 });
-app.listen(PORT, () => {
-  console.log(`Mediapp listening on port ${PORT}.`);
-});
+async function startServer() {
+  const userData = await readDatabase("database/users.json");
+  const serverData = await readDatabase("database/servers.json");
+
+  if (!userData || !serverData) {
+    throw new Error("Failed to load databases");
+  }
+
+  USERSDATABASE = userData;
+  SERVERDATABASE = serverData;
+
+  app.listen(PORT, () => {
+    console.log(`Mediapp listening on port ${PORT}.`);
+  });
+}
+
+startServer();

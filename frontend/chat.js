@@ -45,20 +45,13 @@ function sendMessage(sender, message, isGroup) {
       reject("Must provide all arguments");
       return;
     }
-    fetch(
-      `${server}/sendmsg?${new URLSearchParams({
-        sender: sender,
-        message: message,
-        type: isGroup,
-      }).toString()}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ sender, message }),
-      }
-    )
+    fetch(`${server}/sendmsg`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ sender, message }),
+    })
       .then((res) => {
         if (res.status === 200) {
           resolve(res);
@@ -90,7 +83,7 @@ function createChat(name, des) {
 }
 
 function getChatID(name) {
-  fetch(`${server}/getChatID`, {
+  return fetch(`${server}/getChatID`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -154,15 +147,12 @@ function getChannelMessageServer(name) {
       "X-Content-Type-Options": "nosniff",
     },
   }).then((res) => {
-    res.json().then((json) => (chatMessagesFromServer = res));
+    res.json().then((json) => (chatMessagesFromServer = json));
   });
 }
 
 function getMessagesFromClient() {
-  let messages = {
-    Admin: "Hello",
-    Admin: "Hi",
-  };
+  let messages = [{ sender: loggedInDisplayName, message: "Hi" }];
   return messages;
 }
 
@@ -197,6 +187,7 @@ function pollMessages(serverID) {
       },
     }
   )
+    .then((res) => res.json())
     .then((res) => {
       const server1 = res["SERVER 1"];
       const channel1Messages = server1["Channel 1"].messages;
@@ -213,6 +204,7 @@ function pollMessages(serverID) {
     })
     .catch((err) => {
       console.error(err);
+      return null;
     });
   // Save messages in current chat to server
   saveServerData(getChatID(ServerName));
@@ -305,9 +297,9 @@ function addFriend(userID) {
   console.log("Friend Added With ID: " + userID);
 }
 
-window.onload = () => {
+window.onload = async () => {
   currentChatMessages = document.getElementById("channelMessages").children;
 
-  loadServerData(getChatID(ServerName));
-  const msgReceiveInteval = setInterval(pollMessages(0), 1000);
+  loadServerData(await getChatID(ServerName));
+  const msgReceiveInteval = setInterval(() => pollMessages(0), 1000);
 };
