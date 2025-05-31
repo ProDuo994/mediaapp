@@ -74,7 +74,8 @@ async function findUsernameByDisplayName(
   displayName: string
 ): Promise<string | null> {
   if (!USERSDATABASE) {
-    return console.error("Could not read database");
+    console.error("Could not read database");
+    return null;
   }
   for (const username in USERSDATABASE.accounts) {
     if (USERSDATABASE.accounts[username].displayName === displayName) {
@@ -135,7 +136,8 @@ app.post("/login", async (req: Request, res: Response): Promise<any> => {
         " " +
         new Date().toLocaleTimeString()
     );
-    return res.status(200).send(acc);
+    res.status(200);
+    return res.send(acc);
   } else {
     return res.status(401).send("Incorrect Username/Password");
   }
@@ -344,8 +346,8 @@ app.post("/createChat", async (req: any, res: any) => {
 
 app.get("/getChatID", async (req: Request, res: Response): Promise<any> => {
   const chatName = req.body.chatName;
-  const chatID = USERSDATABASE.servers[chatName].serverID;
-  return res.status(200).send(chatID);
+  const chatID = 0; // To Change to actual database chatID
+  return res.status(200).send({ chatID: chatID });
 });
 
 app.get(
@@ -375,7 +377,7 @@ app.get("/server", async (req: Request, res: Response): Promise<any> => {
   return res.status(200).send(serverData);
 });
 
-app.get("/test", (req: Request, res: Response) => {
+app.get("/test", (_req: Request, res: Response) => {
   // Used to test if the server is running
   return res.status(200);
 });
@@ -428,7 +430,9 @@ app.get("/getChatMessages", async (req: Request, res: any) => {
   if (SERVERDATABASE.messages == undefined) {
     return res.status(404).send("Could not find messages");
   }
-  return res.status(200).send(SERVERDATABASE.servers[String(serverIDStr)].messages);
+  return res
+    .status(200)
+    .send(SERVERDATABASE.servers[String(serverIDStr)].messages);
 });
 app.listen(PORT, () => {
   console.log(`Mediapp listening on port ${PORT}.`);

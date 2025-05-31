@@ -41,11 +41,12 @@ export interface Database {
   messages?: any;
   servers: {
     [serverName: string]: {
+      messages: any;
       serverID: number;
       members: Member[];
       groups: Group[];
     };
-  }
+  };
 }
 
 export interface Folder {

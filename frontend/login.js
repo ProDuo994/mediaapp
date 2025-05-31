@@ -4,7 +4,7 @@ let loginButton;
 function processLogin(displayName, sessionToken) {
   localStorage.setItem("displayName", displayName);
   localStorage.setItem("sessionToken", sessionToken);
-  window.location.href = `${server}/frontend/chat.html`;
+  window.location.href = `http://127.0.0.1:5500/frontend/chat.html`;
 }
 
 function login(username, password) {

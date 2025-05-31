@@ -98,7 +98,7 @@ function getChatID(name) {
     },
   }).then((res) => {
     res.json().then((json) => {
-      let chatID = json;
+      let chatID = json.chatID;
       return chatID;
     });
   });
