@@ -38,7 +38,13 @@ export interface Database {
   accounts: {
     [username: string]: Account;
   };
-  messages?: any;
+  messages: [
+    {
+      sender: string;
+      message: string;
+      timesent: number;
+    }
+  ];
   servers: {
     [serverName: string]: {
       messages: any;

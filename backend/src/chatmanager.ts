@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import fs, { accessSync, read } from "fs";
+import { Client, connect } from "ts-postgres";
 import bcrypt from "bcrypt";
 import {
   Group,
@@ -20,6 +21,23 @@ app.use(
 );
 const PORT: number = 3000;
 let activeChats: string[] = [];
+let SERVERDATABASE: Database;
+let USERSDATABASE: Database;
+
+let client: Client;
+
+(async () => {
+  const userData = await readDatabase("database/users.json");
+  const serverData = await readDatabase("database/servers.json");
+  if (!userData || !serverData) {
+    throw new Error("Failed to load user database");
+  }
+  USERSDATABASE = userData;
+  SERVERDATABASE = serverData;
+  client = await connect();
+})();
+
+//client.query;
 
 async function readDatabase(name: string): Promise<Database | null> {
   try {
@@ -30,19 +48,6 @@ async function readDatabase(name: string): Promise<Database | null> {
     return null;
   }
 }
-
-let SERVERDATABASE: Database;
-let USERSDATABASE: Database;
-
-(async () => {
-  const userData = await readDatabase("database/users.json");
-  const serverData = await readDatabase("database/servers.json");
-  if (!userData || !serverData) {
-    throw new Error("Failed to load user database");
-  }
-  USERSDATABASE = userData;
-  SERVERDATABASE = serverData;
-})();
 
 async function writeDatabase(data: object, name: string) {
   if (!data) return console.log("No Data found");
@@ -156,18 +161,21 @@ app.post("/addFreind", async (req: Request, res: Response): Promise<any> => {
   return res.status(200).send(account);
 });
 
-app.post("/createChannel", async (req: Request, res: Response): Promise<any> => {
-  let cName = req.body.channelName;
-  let cDes = req.body.channelDes;
-  let cOwner = req.body.channelOwner;
-  if (cName == null || cDes == null || cOwner == null) {
-    return res.status(400).send("Please add all arguments");
+app.post(
+  "/createChannel",
+  async (req: Request, res: Response): Promise<any> => {
+    let cName = req.body.channelName;
+    let cDes = req.body.channelDes;
+    let cOwner = req.body.channelOwner;
+    if (cName == null || cDes == null || cOwner == null) {
+      return res.status(400).send("Please add all arguments");
+    }
+    const account: Account | void = USERSDATABASE.accounts[cOwner];
+    if (account === undefined) {
+      return res.status(404).send("Could not find account");
+    }
   }
-  const account: Account | void = USERSDATABASE.accounts[cOwner];
-  if (account === undefined) {
-    return res.status(404).send("Could not find account");
-  }
-});
+);
 
 function formatMessage(
   sender: string,
@@ -335,7 +343,9 @@ app.post("/createChat", async (req: Request, res: Response) => {
     let chatDescription = req.query["chatDes"];
     let chatOwner = req.query["chatOwner"];
     if (!chatName || !chatDescription || !chatOwner) {
-      return res.status(400).send("Chat name or chat description not provided.");
+      return res
+        .status(400)
+        .send("Chat name or chat description not provided.");
     }
     let chat = await createChat(
       chatName as string,
@@ -454,6 +464,13 @@ async function startServer() {
 
   app.listen(PORT, () => {
     console.log(`Mediapp listening on port ${PORT}.`);
+  });
+
+  process.on("SIGTERM", () => {
+    console.log("Server Shutting Down without Error");
+    async () => {
+      await client.end();
+    };
   });
 }
 
