@@ -34,10 +34,12 @@ let client: Client;
   }
   USERSDATABASE = userData;
   SERVERDATABASE = serverData;
-  client = await connect();
+  client = await connect({
+    host: "localhost",
+    port: 5432,
+    password: "postgres",
+  });
 })();
-
-//client.query;
 
 async function readDatabase(name: string): Promise<Database | null> {
   try {
