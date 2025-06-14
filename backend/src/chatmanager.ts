@@ -34,11 +34,11 @@ let client: Client;
   }
   USERSDATABASE = userData;
   SERVERDATABASE = serverData;
-  client = await connect({
-    host: "localhost",
-    port: 5432,
-    password: "postgres",
-  });
+  try {
+    client = await connect();
+  } catch {
+    console.error("Could not connect to SQL Database @ chatmanager:38");
+  }
 })();
 
 async function readDatabase(name: string): Promise<Database | null> {
@@ -317,6 +317,22 @@ async function createChat(
   }
 }
 
+function findServerInDatabase(id: number) {
+  const server: Group = {
+    groupName: "",
+    groupDescription: "",
+    members: [],
+    owner: undefined,
+    isPublic: false,
+    id: id,
+  };
+  if (server) {
+    return server;
+  } else {
+    return null;
+  }
+}
+
 async function getServerMemberUsernames(
   serverID: number
 ): Promise<string | null> {
@@ -339,7 +355,7 @@ async function getServerData(serverID: number): Promise<string | void> {
   return data;
 }
 
-app.post("/createChat", async (req: Request, res: Response) => {
+app.post("/createChat", async (req: Request, res: Response): Promise<any> => {
   try {
     let chatName = req.query["chatName"];
     let chatDescription = req.query["chatDes"];
@@ -371,14 +387,7 @@ app.get(
   `/getChannelMessageServer`,
   async (req: Request, res: Response): Promise<any> => {
     const serverID = req.query["serverID"];
-    const database: Database | null = await readDatabase(
-      "database/servers.json"
-    );
-    if (!database) {
-      return res.status(404).send("Could not find json database");
-    }
-    let messages = database.messages;
-    console.log(messages);
+    let messages = SERVERDATABASE.messages;
     if (messages) {
       return res.status(200).send(messages);
     }
@@ -394,9 +403,9 @@ app.get("/server", async (req: Request, res: Response): Promise<any> => {
   return res.status(200).send(serverData);
 });
 
-app.get("/test", (_req: Request, res: Response) => {
+app.post("/test", (_req: Request, res: Response) => {
   // Used to test if the server is running
-  return res.status(200);
+  return res.status(200).send("Server Is Running");
 });
 
 async function addNewAccountToDatabase(
@@ -439,41 +448,46 @@ async function findMemberInDatabase(
 }
 
 app.get("/getChatMessages", async (req: Request, res: any) => {
-  let serverID = req.query["serverID"];
+  let serverID = req.query["serverID"] as number;
   if (serverID == undefined) {
     return res.status(400).send("Must provide server ID");
   }
   const serverIDStr = Array.isArray(serverID) ? serverID[0] : serverID;
-  console.log("SERVERDATABASE", SERVERDATABASE.servers);
-  console.log("Requested serverID:", serverIDStr);
+  console.log("SERVERDATABASE: ", SERVERDATABASE.servers);
   if (SERVERDATABASE.messages == undefined) {
     return res.status(404).send("Could not find messages");
   }
-  return res
-    .status(200)
-    .send(SERVERDATABASE.servers[String(serverIDStr)].messages);
+  return res.status(200).send(findServerInDatabase(serverID));
 });
+
 async function startServer() {
-  const userData = await readDatabase("database/users.json");
-  const serverData = await readDatabase("database/servers.json");
-
-  if (!userData || !serverData) {
-    throw new Error("Failed to load databases");
-  }
-
-  USERSDATABASE = userData;
-  SERVERDATABASE = serverData;
-
-  app.listen(PORT, () => {
-    console.log(`Mediapp listening on port ${PORT}.`);
-  });
-
-  process.on("SIGTERM", () => {
-    console.log("Server Shutting Down without Error");
-    async () => {
+  try {
+    const userData = await readDatabase("database/users.json");
+    const serverData = await readDatabase("database/servers.json");
+    if (!userData || !serverData) {
+      throw new Error("Failed to load databases");
+    }
+    USERSDATABASE = userData;
+    SERVERDATABASE = serverData;
+    try {
+      client = await connect();
+      console.log("Connected to SQL database.");
+    } catch (sqlError) {
+      console.error(
+        "Could not connect to SQL Database @ chatmanager:startServer",
+        sqlError
+      );
+    }
+    app.listen(PORT, () => {
+      console.log(`Mediapp listening on port ${PORT}.`);
+    });
+    process.on("SIGTERM", async () => {
+      console.log("Server Shutting Down without Error");
       await client.end();
-    };
-  });
+    });
+  } catch (error) {
+    console.error("Server failed:", error);
+    process.exit(1);
+  }
 }
-
 startServer();

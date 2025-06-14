@@ -172,7 +172,11 @@ function updateSettingsEndpoint(serverName, serverDes, isVisible, canMessage) {
   });
 }
 
-function createChannel(chatName, channelName) {}
+function createChannel(chatName, channelName) {
+  if (chatName == undefined || channelName == undefined) {
+    console.error("All args not fufilled @ chat.js @ 177");
+  }
+}
 
 function pollMessages(serverID) {
   fetch(
@@ -203,10 +207,12 @@ function pollMessages(serverID) {
       }
     })
     .catch((err) => {
-      console.error(err);
+      if (err && typeof err == String) {
+        console.error(err);
+        return null;
+      }
       return null;
     });
-  // Save messages in current chat to server
   saveServerData(getChatID(ServerName));
 }
 
@@ -222,7 +228,6 @@ const visibleCheckbox = document.getElementById("visibleCheckbox");
 const messageCheckbox = document.getElementById("messageCheckbox");
 const channelNameInput = document.getElementById("channelNameBox");
 const channelDesInput = document.getElementById("chanelDesBox");
-
 let channelName = "Test Server";
 let channelDes = "Test Description";
 let visible = true;
@@ -247,27 +252,22 @@ channelSettingsButton.addEventListener("click", (event) => {
   channelSettingsGui.showModal();
   getOldServerSettings();
 });
-
 addChannelButton.addEventListener("click", (event) => {
   newChannelDialog.showModal();
   createChannel();
 });
-
 newChannelCancel.addEventListener("click", (event) => {
   newChannelDialog.close();
 });
-
 newChannelDialogForm.addEventListener("submit", (event) => {
   event.preventDefault();
   newChannelDialog.close();
 });
-
 channelSettingsGui.addEventListener("submit", (event) => {
   event.preventDefault();
   updateSettings();
   channelSettingsGui.close();
 });
-
 channelSettingsClose.addEventListener("click", (event) => {
   event.preventDefault();
   channelSettingsGui.close();
@@ -285,6 +285,8 @@ messageBoxInput.addEventListener("keydown", (event) => {
 
 function loadServerData(serverID) {
   let database = "../backend/database.json";
+  let data = database.servers[serverID];
+  return data;
 }
 
 function saveServerData(serverID) {
@@ -299,7 +301,6 @@ function addFriend(userID) {
 
 window.onload = async () => {
   currentChatMessages = document.getElementById("channelMessages").children;
-
   loadServerData(await getChatID(ServerName));
   const msgReceiveInteval = setInterval(() => pollMessages(0), 1000);
 };
