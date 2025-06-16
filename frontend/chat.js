@@ -50,7 +50,7 @@ function sendMessage(sender, message, isGroup) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ sender, message }),
+      body: JSON.stringify({ sender, message, isGroup }),
     })
       .then((res) => {
         if (res.status === 200) {
@@ -279,7 +279,7 @@ messageBoxInput.addEventListener("keydown", (event) => {
     messageBoxInput.value = "";
     createAndAppend("h4", messageViewBox, loggedInDisplayName + ": " + message);
     messageHistory.push(message);
-    sendMessage(accountName, message, false);
+    sendMessage(loggedInDisplayName, message, false);
   }
 });
 

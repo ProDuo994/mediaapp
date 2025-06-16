@@ -4,6 +4,8 @@
     "dbaeumer.vscode-eslint",
     "yandeu.five-server",
     "esbenp.prettier-vscode",
-    "formulahendry.auto-rename-tag"
+    "formulahendry.auto-rename-tag",
+    "visualstudioexptteam.vscodeintellicode",
+    "visualstudioexptteam.intellicode-api-usage-examples"
   ]
 }

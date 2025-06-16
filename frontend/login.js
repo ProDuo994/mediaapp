@@ -24,8 +24,8 @@ function login(username, password) {
     .then((res) => {
       console.log("received response");
       if (res.ok) {
-        res.json().then((account) => {
-          processLogin(account.displayName, 0);
+        res.json().then((displayname) => {
+          processLogin(displayname, 0);
         });
       } else {
         window.alert("Username or Password incorrect!");

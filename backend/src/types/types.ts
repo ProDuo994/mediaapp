@@ -1,15 +1,14 @@
 export interface Group {
   groupName: string;
   groupDescription: string;
-  members: Account[];
+  members: Profile[];
   owner: Account | undefined;
   isPublic: boolean;
   id: number;
 }
 
-export interface Member {
+export interface Profile {
   username: string;
-  password: string;
   displayName: string;
   userID: number;
 }
@@ -49,7 +48,7 @@ export interface Database {
     [serverName: string]: {
       messages: any;
       serverID: number;
-      members: Member[];
+      members: Profile[];
       groups: Group[];
     };
   };

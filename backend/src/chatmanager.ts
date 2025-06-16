@@ -1,14 +1,14 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import fs, { accessSync, read } from "fs";
-import { Client, connect } from "ts-postgres";
+import { Client, connect, Result, ResultIterator } from "ts-postgres";
 import bcrypt from "bcrypt";
 import {
   Group,
   Account,
   Message,
   Database,
-  Member,
+  Profile,
   Folder,
 } from "./types/types";
 const app = express();
@@ -35,7 +35,11 @@ let client: Client;
   USERSDATABASE = userData;
   SERVERDATABASE = serverData;
   try {
-    client = await connect();
+    client = await connect({
+      user: "postgres",
+      password: "postgres",
+      database: "mediapp",
+    });
   } catch {
     console.error("Could not connect to SQL Database @ chatmanager:38");
   }
@@ -108,8 +112,7 @@ async function findAccountInDatabase(
 }
 
 app.post("/signup", async (req: Request, res: Response): Promise<any> => {
-  let username = req.body.username;
-  let password = req.body.password;
+  const { username, password } = req.body;
   if (username == null || password == null) {
     res.status(400).send("Please add all arguments");
   }
@@ -126,12 +129,16 @@ app.post("/signup", async (req: Request, res: Response): Promise<any> => {
 });
 
 app.post("/login", async (req: Request, res: Response): Promise<any> => {
-  let usr = req.body.username;
-  let psw = req.body.password;
-  let acc: Account | void = await findAccountInDatabase(
+  let { usr, psw } = req.body;
+  /*let acc: Account | void = await findAccountInDatabase(
     "database/users.json",
     usr
+  );*/
+  const result: ResultIterator<Account> = client.query<Account>(
+    `SELECT * FROM users WHERE username='${usr}' AND password='${psw}'`
   );
+  console.log(await result);
+  const acc = await result.one();
   if (acc === undefined) {
     return res.status(400).send("Could not find account");
   }
@@ -143,16 +150,14 @@ app.post("/login", async (req: Request, res: Response): Promise<any> => {
         " " +
         new Date().toLocaleTimeString()
     );
-    res.status(200);
-    return res.send(acc);
+    return res.send(acc.displayName as string).status(200);
   } else {
     return res.status(401).send("Incorrect Username/Password");
   }
 });
 
 app.post("/addFreind", async (req: Request, res: Response): Promise<any> => {
-  let usr = req.body.username;
-  let friendName = req.body.friendName;
+  let { usr, friendName } = req.body;
   if (usr == null || friendName == null) {
     return res.status(400).send("Please add all arguments");
   }
@@ -191,10 +196,9 @@ function formatMessage(
   };
 }
 
-function getOwnerOfGroup(groupName: string): Member | null {
-  const owner: Member = {
+function getOwnerOfGroup(groupName: string): Profile | null {
+  const owner: Profile = {
     username: "",
-    password: "",
     displayName: "",
     userID: 0,
   };
@@ -210,7 +214,7 @@ function messageToString(messageObject: Message) {
 
 app.post("/sendmsg", async (req: Request, res: Response): Promise<any> => {
   const { sender, message, isGroup } = req.body;
-  if (!sender || !message || !isGroup) {
+  if (!sender || !message) {
     console.error("All args not provided");
     return res.status(400).send("All args not provided");
   }
@@ -242,6 +246,7 @@ app.post("/sendmsg", async (req: Request, res: Response): Promise<any> => {
       timesent: fullMessage.timesent,
     };
     writeDatabase(JSONMsg, "database/users.json");
+    console.log(JSONMsg);
     return res.status(200).send("Direct message sent");
   }
 });
@@ -251,7 +256,7 @@ async function updateSettings(
   serverDes: string,
   isVisible: boolean
 ) {
-  let groupMembers: Member[] = [];
+  let groupMembers: Profile[] = [];
   let groupToUpdate: Group = {
     groupName: oldServerName,
     groupDescription: serverDes,
@@ -273,16 +278,15 @@ app.post("/updateSettings", async (req: Request, res: Response) => {
   res.status(200).send("Settings updated");
 });
 
-async function usernameToMember(username: string): Promise<Member | null> {
+async function usernameToMember(username: string): Promise<Profile | null> {
   let usernameInDatabase = USERSDATABASE.accounts[username];
   if (usernameInDatabase == undefined) {
     return null;
   }
-  const member: Member = {
+  const member: Profile = {
     username: "Name",
     displayName: "name",
     userID: 1,
-    password: usernameInDatabase.password,
   };
   return member;
 }
@@ -426,7 +430,7 @@ async function addNewAccountToDatabase(
 async function findMemberInDatabase(
   username: string,
   databaseName: string
-): Promise<Member | undefined> {
+): Promise<Profile | undefined> {
   if (!username) {
     console.error("Username not provided");
     return undefined;
@@ -436,10 +440,9 @@ async function findMemberInDatabase(
     return undefined;
   }
   const account: Account | undefined = database.accounts[username];
-  let member: Member | undefined = account
+  let member: Profile | undefined = account
     ? {
         username,
-        password: account.password,
         displayName: username,
         userID: account.userID,
       }
@@ -467,17 +470,7 @@ async function startServer() {
     if (!userData || !serverData) {
       throw new Error("Failed to load databases");
     }
-    USERSDATABASE = userData;
-    SERVERDATABASE = serverData;
-    try {
-      client = await connect();
-      console.log("Connected to SQL database.");
-    } catch (sqlError) {
-      console.error(
-        "Could not connect to SQL Database @ chatmanager:startServer",
-        sqlError
-      );
-    }
+
     app.listen(PORT, () => {
       console.log(`Mediapp listening on port ${PORT}.`);
     });
