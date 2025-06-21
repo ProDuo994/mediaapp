@@ -17,8 +17,8 @@ function login(username, password) {
       "X-Content-Type-Options": "nosniff",
     },
     body: JSON.stringify({
-      username,
-      password,
+      usr: username,
+      psw: password,
     }),
   })
     .then((res) => {
